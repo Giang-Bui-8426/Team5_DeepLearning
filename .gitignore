@@ -1,0 +1,14 @@
+# Dataset tự tải bởi torchvision (download=True)
+data/
+
+# Trọng số model sinh ra khi huấn luyện
+*.pth
+
+# Ảnh kết quả do lab1_train_evaluate.py sinh ra
+compare_configs.png
+confusion_matrix.png
+predicted_vs_actual.png
+misclassified.png
+
+# File bytecode Python
+__pycache__/
