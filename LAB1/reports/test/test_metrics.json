@@ -1,0 +1,91 @@
+{
+  "model": "05_medium_mlp",
+  "checkpoint_epoch": 28,
+  "dataset": "FashionMNIST official test split",
+  "metrics": {
+    "samples": 10000,
+    "loss": 0.29092166801691055,
+    "accuracy": 0.9028,
+    "precision_macro": 0.902544542317532,
+    "recall_macro": 0.9027999999999998,
+    "f1_macro": 0.9025226261280557,
+    "fpr_macro": 0.0108,
+    "auc_macro_ovr": 0.9934181333333333,
+    "auc_micro_ovr": 0.9957679144444446
+  },
+  "classification_report": {
+    "T-shirt/top": {
+      "precision": 0.8552894211576846,
+      "recall": 0.857,
+      "f1-score": 0.8561438561438561,
+      "support": 1000.0
+    },
+    "Trouser": {
+      "precision": 0.9949135300101729,
+      "recall": 0.978,
+      "f1-score": 0.9863842662632375,
+      "support": 1000.0
+    },
+    "Pullover": {
+      "precision": 0.8231884057971014,
+      "recall": 0.852,
+      "f1-score": 0.8373464373464373,
+      "support": 1000.0
+    },
+    "Dress": {
+      "precision": 0.8976608187134503,
+      "recall": 0.921,
+      "f1-score": 0.9091806515301086,
+      "support": 1000.0
+    },
+    "Coat": {
+      "precision": 0.8364532019704434,
+      "recall": 0.849,
+      "f1-score": 0.8426799007444169,
+      "support": 1000.0
+    },
+    "Sandal": {
+      "precision": 0.9745417515274949,
+      "recall": 0.957,
+      "f1-score": 0.9656912209889001,
+      "support": 1000.0
+    },
+    "Shirt": {
+      "precision": 0.7630736392742796,
+      "recall": 0.715,
+      "f1-score": 0.738255033557047,
+      "support": 1000.0
+    },
+    "Sneaker": {
+      "precision": 0.9403131115459883,
+      "recall": 0.961,
+      "f1-score": 0.950544015825915,
+      "support": 1000.0
+    },
+    "Bag": {
+      "precision": 0.9819277108433735,
+      "recall": 0.978,
+      "f1-score": 0.9799599198396793,
+      "support": 1000.0
+    },
+    "Ankle boot": {
+      "precision": 0.9580838323353293,
+      "recall": 0.96,
+      "f1-score": 0.9590409590409591,
+      "support": 1000.0
+    },
+    "accuracy": 0.9028,
+    "macro avg": {
+      "precision": 0.902544542317532,
+      "recall": 0.9027999999999998,
+      "f1-score": 0.9025226261280557,
+      "support": 10000.0
+    },
+    "weighted avg": {
+      "precision": 0.9025445423175319,
+      "recall": 0.9028,
+      "f1-score": 0.9025226261280557,
+      "support": 10000.0
+    }
+  }
+}

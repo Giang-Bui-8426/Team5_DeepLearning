@@ -1,0 +1,20 @@
+digraph model_training_modes {
+  graph [rankdir=LR, bgcolor="white", pad="0.28", nodesep="0.60", ranksep="0.80", dpi=165, fontname="DejaVu Sans", labelloc=t, label="Two transfer-learning modes — same pretrained weights and new 10-class head", fontsize=17, fontcolor="#273B57"];
+  node [shape=box, style="rounded,filled", color="#C4D2E0", penwidth=1.2, fontname="DejaVu Sans", fontsize=13, margin="0.22,0.14"];
+  edge [color="#6C7F95", penwidth=1.8, arrowsize=0.78];
+  subgraph cluster_tune {
+    label="B. Partial fine-tuning"; color="#D7E1EE"; style="rounded"; fontcolor="#39526E"; fontsize=14;
+    d [label="Frozen early backbone\nno parameter updates", fillcolor="#E8EDF4", color="#AFBDD0"];
+    e [label="Trainable last backbone stage\nselected parameters update", fillcolor="#FFF1DE", color="#D8A66B"];
+    f [label="New 10-class head\nTRAINABLE", fillcolor="#E5F5F0", color="#61AD94"];
+    d->e->f;
+  }
+  subgraph cluster_feat {
+    label="A. Feature extraction"; color="#D7E1EE"; style="rounded"; fontcolor="#39526E"; fontsize=14;
+    a [label="Frozen early backbone\nno parameter updates", fillcolor="#E8EDF4", color="#AFBDD0"];
+    b [label="Frozen final backbone stage\nno parameter updates", fillcolor="#E8EDF4", color="#AFBDD0"];
+    c [label="New 10-class head\nTRAINABLE", fillcolor="#E5F5F0", color="#61AD94"];
+    a->b->c;
+  }
+  {rank=same;a;d}
+}

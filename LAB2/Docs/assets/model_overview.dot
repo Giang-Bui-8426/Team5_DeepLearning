@@ -1,0 +1,20 @@
+digraph model_overview {
+  graph [rankdir=LR, bgcolor="white", pad="0.22", nodesep="0.42", ranksep="0.65", dpi=170, fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", color="#C9D3E1", fillcolor="#F8FAFC", penwidth=1.2, fontname="DejaVu Sans", fontsize=13, margin="0.20,0.13"];
+  edge [color="#72869F", penwidth=1.7, arrowsize=0.74];
+  input [label="Fashion-MNIST\n[B, 3, 224, 224]", fillcolor="#EAF3FF", color="#84AED4", fontcolor="#193C65"];
+  r [label="ResNet18\nconv → layer1–4 → avgpool\n[B, 512]"];
+  v [label="VGG16\nfeatures → avgpool → classifier[0:6]\n[B, 4096]"];
+  d [label="DenseNet121\nfeatures → GAP\n[B, 1024]"];
+  rh [label="New fc\n512 → 10", fillcolor="#E5F5F0", color="#58A58C"];
+  vh [label="New classifier[6]\n4096 → 10", fillcolor="#E5F5F0", color="#58A58C"];
+  dh [label="New classifier\n1024 → 10", fillcolor="#E5F5F0", color="#58A58C"];
+  ro [label="Logits\n[B, 10]", fillcolor="#E5F5F0", color="#58A58C"];
+  vo [label="Logits\n[B, 10]", fillcolor="#E5F5F0", color="#58A58C"];
+  do [label="Logits\n[B, 10]", fillcolor="#E5F5F0", color="#58A58C"];
+  { rank=same; r;v;d }
+  { rank=same; rh;vh;dh }
+  { rank=same; ro;vo;do }
+  input->r; input->v; input->d;
+  r->rh->ro; v->vh->vo; d->dh->do;
+}
