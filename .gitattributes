@@ -1,0 +1,42 @@
+# LAB1 / LAB2 - Thong nhat xu ly file giua cac he dieu hanh.
+# Chi ap dung cho cac file duoc Git theo doi (.gitignore quyet dinh file nao bo qua).
+* text=auto
+
+# Source code va tai lieu: luon dung LF khi checkout.
+*.py      text eol=lf
+*.ipynb   text eol=lf
+*.md      text eol=lf
+*.txt     text eol=lf
+*.html    text eol=lf
+*.css     text eol=lf
+*.js      text eol=lf
+*.json    text eol=lf
+*.csv     text eol=lf
+*.yaml    text eol=lf
+*.yml     text eol=lf
+*.toml    text eol=lf
+*.sh      text eol=lf
+*.gitignore text eol=lf
+*.gitattributes text eol=lf
+
+# Script Windows: CRLF de chay truc tiep tren Windows.
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+*.ps1     text eol=crlf
+
+# Hinh, bao cao va trong so mo hinh la binary.
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.webp    binary
+*.svg     text eol=lf
+*.pdf     binary
+*.pt      binary
+*.pth     binary
+*.ckpt    binary
+*.onnx    binary
+*.npz     binary
+*.npy     binary
+*.zip     binary
+*.gz      binary

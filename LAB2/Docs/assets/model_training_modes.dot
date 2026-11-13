@@ -1,20 +1,49 @@
 digraph model_training_modes {
-  graph [rankdir=LR, bgcolor="white", pad="0.28", nodesep="0.60", ranksep="0.80", dpi=165, fontname="DejaVu Sans", labelloc=t, label="Two transfer-learning modes — same pretrained weights and new 10-class head", fontsize=17, fontcolor="#273B57"];
-  node [shape=box, style="rounded,filled", color="#C4D2E0", penwidth=1.2, fontname="DejaVu Sans", fontsize=13, margin="0.22,0.14"];
-  edge [color="#6C7F95", penwidth=1.8, arrowsize=0.78];
-  subgraph cluster_tune {
-    label="B. Partial fine-tuning"; color="#D7E1EE"; style="rounded"; fontcolor="#39526E"; fontsize=14;
-    d [label="Frozen early backbone\nno parameter updates", fillcolor="#E8EDF4", color="#AFBDD0"];
-    e [label="Trainable last backbone stage\nselected parameters update", fillcolor="#FFF1DE", color="#D8A66B"];
-    f [label="New 10-class head\nTRAINABLE", fillcolor="#E5F5F0", color="#61AD94"];
-    d->e->f;
-  }
-  subgraph cluster_feat {
-    label="A. Feature extraction"; color="#D7E1EE"; style="rounded"; fontcolor="#39526E"; fontsize=14;
-    a [label="Frozen early backbone\nno parameter updates", fillcolor="#E8EDF4", color="#AFBDD0"];
-    b [label="Frozen final backbone stage\nno parameter updates", fillcolor="#E8EDF4", color="#AFBDD0"];
-    c [label="New 10-class head\nTRAINABLE", fillcolor="#E5F5F0", color="#61AD94"];
-    a->b->c;
-  }
-  {rank=same;a;d}
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans"];
+  ResNet18_fe_0 [label="Stem + layer1–3\nImageNet · frozen", fillcolor="#EDF2F7"];
+  ResNet18_fe_1 [label="layer4\nFrozen", fillcolor="#EDF2F7"];
+  ResNet18_fe_2 [label="AvgPool → Flatten\nCác phép toán giữ nguyên", fillcolor="#FFFFFF"];
+  ResNet18_fe_3 [label="fc · 512→10\nTrain head 10 lớp", fillcolor="#DEF5E9"];
+  ResNet18_ft_0 [label="Stem + layer1–3\nLoad best FE · frozen", fillcolor="#EDF2F7"];
+  ResNet18_ft_1 [label="layer4\nTrainable", fillcolor="#FFF0CD"];
+  ResNet18_ft_2 [label="AvgPool → Flatten\nCác phép toán giữ nguyên", fillcolor="#FFFFFF"];
+  ResNet18_ft_3 [label="fc · 512→10\nGiữ head đã học · tiếp tục train", fillcolor="#DEF5E9"];
+  VGG16_fe_0 [label="features[0:24]\nImageNet · frozen", fillcolor="#EDF2F7"];
+  VGG16_fe_1 [label="features[24:]\nFrozen", fillcolor="#EDF2F7"];
+  VGG16_fe_2 [label="AvgPool → Flatten → FC1/FC2\nclassifier[0:6] frozen · Dropout eval", fillcolor="#EDF2F7"];
+  VGG16_fe_3 [label="classifier[6] · 4096→10\nTrain head 10 lớp", fillcolor="#DEF5E9"];
+  VGG16_ft_0 [label="features[0:24]\nLoad best FE · frozen", fillcolor="#EDF2F7"];
+  VGG16_ft_1 [label="features[24:]\nTrainable", fillcolor="#FFF0CD"];
+  VGG16_ft_2 [label="AvgPool → Flatten → FC1/FC2\nclassifier[0:6] frozen · Dropout eval", fillcolor="#EDF2F7"];
+  VGG16_ft_3 [label="classifier[6] · 4096→10\nGiữ head đã học · tiếp tục train", fillcolor="#DEF5E9"];
+  DenseNet121_fe_0 [label="Stem → transition3\nImageNet · frozen", fillcolor="#EDF2F7"];
+  DenseNet121_fe_1 [label="denseblock4 + norm5\nFrozen", fillcolor="#EDF2F7"];
+  DenseNet121_fe_2 [label="ReLU → GAP → Flatten\nCác phép toán giữ nguyên", fillcolor="#FFFFFF"];
+  DenseNet121_fe_3 [label="classifier · 1024→10\nTrain head 10 lớp", fillcolor="#DEF5E9"];
+  DenseNet121_ft_0 [label="Stem → transition3\nLoad best FE · frozen", fillcolor="#EDF2F7"];
+  DenseNet121_ft_1 [label="denseblock4 + norm5\nTrainable", fillcolor="#FFF0CD"];
+  DenseNet121_ft_2 [label="ReLU → GAP → Flatten\nCác phép toán giữ nguyên", fillcolor="#FFFFFF"];
+  DenseNet121_ft_3 [label="classifier · 1024→10\nGiữ head đã học · tiếp tục train", fillcolor="#DEF5E9"];
+  ResNet18_fe_0 -> ResNet18_fe_1;
+  ResNet18_fe_1 -> ResNet18_fe_2;
+  ResNet18_fe_2 -> ResNet18_fe_3;
+  ResNet18_ft_0 -> ResNet18_ft_1;
+  ResNet18_ft_1 -> ResNet18_ft_2;
+  ResNet18_ft_2 -> ResNet18_ft_3;
+  ResNet18_fe_3 -> ResNet18_ft_0 [style=dashed];
+  VGG16_fe_0 -> VGG16_fe_1;
+  VGG16_fe_1 -> VGG16_fe_2;
+  VGG16_fe_2 -> VGG16_fe_3;
+  VGG16_ft_0 -> VGG16_ft_1;
+  VGG16_ft_1 -> VGG16_ft_2;
+  VGG16_ft_2 -> VGG16_ft_3;
+  VGG16_fe_3 -> VGG16_ft_0 [style=dashed];
+  DenseNet121_fe_0 -> DenseNet121_fe_1;
+  DenseNet121_fe_1 -> DenseNet121_fe_2;
+  DenseNet121_fe_2 -> DenseNet121_fe_3;
+  DenseNet121_ft_0 -> DenseNet121_ft_1;
+  DenseNet121_ft_1 -> DenseNet121_ft_2;
+  DenseNet121_ft_2 -> DenseNet121_ft_3;
+  DenseNet121_fe_3 -> DenseNet121_ft_0 [style=dashed];
 }

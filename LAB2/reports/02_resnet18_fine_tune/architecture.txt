@@ -1,0 +1,150 @@
+CNN(
+  (network): ResNet(
+    (conv1): Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (relu): ReLU(inplace=True)
+    (maxpool): MaxPool2d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (layer1): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer2): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): Sequential(
+          (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BasicBlock(
+        (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer3): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): Sequential(
+          (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BasicBlock(
+        (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer4): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): Sequential(
+          (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BasicBlock(
+        (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
+    (fc): Linear(in_features=512, out_features=10, bias=True)
+  )
+)
+{'n_params': 11181642, 'trainable_params': 8398858}
+Parameter | Shape | Count | Trainable
+network.conv1.weight | (64, 3, 7, 7) | 9408 | False
+network.bn1.weight | (64,) | 64 | False
+network.bn1.bias | (64,) | 64 | False
+network.layer1.0.conv1.weight | (64, 64, 3, 3) | 36864 | False
+network.layer1.0.bn1.weight | (64,) | 64 | False
+network.layer1.0.bn1.bias | (64,) | 64 | False
+network.layer1.0.conv2.weight | (64, 64, 3, 3) | 36864 | False
+network.layer1.0.bn2.weight | (64,) | 64 | False
+network.layer1.0.bn2.bias | (64,) | 64 | False
+network.layer1.1.conv1.weight | (64, 64, 3, 3) | 36864 | False
+network.layer1.1.bn1.weight | (64,) | 64 | False
+network.layer1.1.bn1.bias | (64,) | 64 | False
+network.layer1.1.conv2.weight | (64, 64, 3, 3) | 36864 | False
+network.layer1.1.bn2.weight | (64,) | 64 | False
+network.layer1.1.bn2.bias | (64,) | 64 | False
+network.layer2.0.conv1.weight | (128, 64, 3, 3) | 73728 | False
+network.layer2.0.bn1.weight | (128,) | 128 | False
+network.layer2.0.bn1.bias | (128,) | 128 | False
+network.layer2.0.conv2.weight | (128, 128, 3, 3) | 147456 | False
+network.layer2.0.bn2.weight | (128,) | 128 | False
+network.layer2.0.bn2.bias | (128,) | 128 | False
+network.layer2.0.downsample.0.weight | (128, 64, 1, 1) | 8192 | False
+network.layer2.0.downsample.1.weight | (128,) | 128 | False
+network.layer2.0.downsample.1.bias | (128,) | 128 | False
+network.layer2.1.conv1.weight | (128, 128, 3, 3) | 147456 | False
+network.layer2.1.bn1.weight | (128,) | 128 | False
+network.layer2.1.bn1.bias | (128,) | 128 | False
+network.layer2.1.conv2.weight | (128, 128, 3, 3) | 147456 | False
+network.layer2.1.bn2.weight | (128,) | 128 | False
+network.layer2.1.bn2.bias | (128,) | 128 | False
+network.layer3.0.conv1.weight | (256, 128, 3, 3) | 294912 | False
+network.layer3.0.bn1.weight | (256,) | 256 | False
+network.layer3.0.bn1.bias | (256,) | 256 | False
+network.layer3.0.conv2.weight | (256, 256, 3, 3) | 589824 | False
+network.layer3.0.bn2.weight | (256,) | 256 | False
+network.layer3.0.bn2.bias | (256,) | 256 | False
+network.layer3.0.downsample.0.weight | (256, 128, 1, 1) | 32768 | False
+network.layer3.0.downsample.1.weight | (256,) | 256 | False
+network.layer3.0.downsample.1.bias | (256,) | 256 | False
+network.layer3.1.conv1.weight | (256, 256, 3, 3) | 589824 | False
+network.layer3.1.bn1.weight | (256,) | 256 | False
+network.layer3.1.bn1.bias | (256,) | 256 | False
+network.layer3.1.conv2.weight | (256, 256, 3, 3) | 589824 | False
+network.layer3.1.bn2.weight | (256,) | 256 | False
+network.layer3.1.bn2.bias | (256,) | 256 | False
+network.layer4.0.conv1.weight | (512, 256, 3, 3) | 1179648 | True
+network.layer4.0.bn1.weight | (512,) | 512 | True
+network.layer4.0.bn1.bias | (512,) | 512 | True
+network.layer4.0.conv2.weight | (512, 512, 3, 3) | 2359296 | True
+network.layer4.0.bn2.weight | (512,) | 512 | True
+network.layer4.0.bn2.bias | (512,) | 512 | True
+network.layer4.0.downsample.0.weight | (512, 256, 1, 1) | 131072 | True
+network.layer4.0.downsample.1.weight | (512,) | 512 | True
+network.layer4.0.downsample.1.bias | (512,) | 512 | True
+network.layer4.1.conv1.weight | (512, 512, 3, 3) | 2359296 | True
+network.layer4.1.bn1.weight | (512,) | 512 | True
+network.layer4.1.bn1.bias | (512,) | 512 | True
+network.layer4.1.conv2.weight | (512, 512, 3, 3) | 2359296 | True
+network.layer4.1.bn2.weight | (512,) | 512 | True
+network.layer4.1.bn2.bias | (512,) | 512 | True
+network.fc.weight | (10, 512) | 5120 | True
+network.fc.bias | (10,) | 10 | True

@@ -1,149 +1,135 @@
-# Practice 2 — Đặc tả dữ liệu và tiền xử lý
+# LAB2 — Dữ liệu và kết luận EDA
 
-> **Mục đích:** Cả ba kiến trúc và cả hai chế độ *feature extraction* / *fine-tuning* phải sử dụng cùng một cách chia dữ liệu và một quy trình tiền xử lý nhất quán. Tài liệu mô tả yêu cầu triển khai, không phải kết quả của một lần huấn luyện đã thực hiện.
+Tài liệu quy định dữ liệu, cách chia tập, đầu vào và các kết luận EDA phục vụ triển khai. Thiết kế mạng thuộc [model.md](model.md); cấu hình augmentation và DataLoader thuộc [trainning.md](trainning.md); quy trình test thuộc [demo.md](demo.md).
 
-## 1. Bộ dữ liệu và đầu ra cần đạt
+## 1. Dataset và nhãn
 
-Nhóm tiếp tục chọn Fashion-MNIST từ Practice 1 để đối chiếu kết quả của MLP huấn luyện từ đầu với các mạng đã học đặc trưng từ ImageNet. Bộ dữ liệu gồm 70.000 ảnh xám 28 × 28, trong đó 60.000 ảnh thuộc tập huấn luyện chính thức và 10.000 ảnh thuộc tập test chính thức.
+Dùng **CIFAR-10** qua `torchvision.datasets.CIFAR10`. Dataset hiện được giải nén tại `LAB2/data/prepared/cifar-10-batches-py/`; `root` của torchvision là `LAB2/data/prepared/`.
 
-![Ví dụ 10 lớp Fashion-MNIST](assets/fashion_mnist_samples.png)
+| Thuộc tính | Yêu cầu |
+|---|---|
+| Train gốc /  test | 50.000 / 10.000 ảnh, tổng 60.000 |
+| Ảnh gốc | RGB, 32×32×3; mảng NHWC `[N,32,32,3]`, `uint8`, pixel 0–255 |
+| Nhãn | Một nhãn nguyên 0–9 cho mỗi ảnh; không có lớp bổ sung |
+| Cân bằng lớp | Train gốc 5.000 ảnh/lớp;  test 1.000 ảnh/lớp |
 
-*Hình 1. Mười lớp của Fashion-MNIST*
+Thứ tự lớp phải thống nhất giữa dataset, đầu ra mạng và báo cáo dự đoán:
 
-Các nhãn phải giữ đúng thứ tự từ `0` đến `9`:
-
-| ID | Nhãn | ID | Nhãn |
+| ID | Lớp | ID | Lớp |
 |:--:|---|:--:|---|
-| 0 | T-shirt/top | 5 | Sandal |
-| 1 | Trouser | 6 | Shirt |
-| 2 | Pullover | 7 | Sneaker |
-| 3 | Dress | 8 | Bag |
-| 4 | Coat | 9 | Ankle boot |
+| 0 | airplane | 5 | dog |
+| 1 | automobile | 6 | frog |
+| 2 | bird | 7 | horse |
+| 3 | cat | 8 | ship |
+| 4 | deer | 9 | truck |
 
-**Hợp đồng đầu vào/đầu ra:** một ảnh sau preprocessing phải có dạng **`float32 [3, 224, 224]`**; một batch có dạng **`[B, 3, 224, 224]`**. Nhãn là số nguyên `0..9` (`torch.long` khi đưa vào loss), không chuyển thành one-hot cho `CrossEntropyLoss`.
+Không đổi chỉ số nhãn khi trình bày tên lớp. Cột đầu ra thứ `k` luôn ứng với lớp có ID `k`.
 
-## 2. Chia dữ liệu và phòng tránh rò rỉ
+![Ảnh mẫu thuộc 10 lớp CIFAR-10](assets/eda_class_gallery.png)
 
-Nhóm yêu cầu giữ lại phép chia của Practice 1, để phép đối chiếu giữa LAB1 và LAB2 không bị ảnh hưởng bởi việc thay tập validation.
+*Ảnh mẫu trích từ báo cáo EDA; hình ảnh minh họa không xác định mức độ khó của từng lớp.*
 
-| Tập | Số ảnh | Cách lấy | Vai trò |
-|---|---:|---|---|
-| **Train** | 50.000 | Từ 60.000 ảnh `train=True` | Học trọng số của classifier và phần backbone được mở khóa |
-| **Validation** | 10.000 | Phần còn lại của `train=True` | So sánh cấu hình, theo dõi hội tụ, chọn checkpoint |
-| **Test** | 10.000 | Toàn bộ `train=False` | Đánh giá cuối cùng sau khi chọn model |
+## 2. Split cố định và giới hạn sử dụng
 
-Phép chia phải dùng `torch.randperm(60000, generator=torch.Generator().manual_seed(1))`, lấy 50.000 chỉ số đầu cho train và 10.000 chỉ số còn lại cho validation. Đây là phép chia ngẫu nhiên cố định, không phải stratified split. Cần lưu hai danh sách chỉ số để các lần chạy và các kiến trúc dùng đúng một tập dữ liệu; kiểm tra phân bố nhãn sau chia nhưng không tự ý chia lại nếu chưa thay đổi đặc tả.
+| Tập | Số ảnh | Mỗi lớp | Mục đích |
+|---|---:|---:|---|
+| Train fit | 45.000 | 4.500 | Học trọng số; fit các thống kê hoặc phép biến đổi cần học từ dữ liệu |
+| Validation | 5.000 | 500 | Chọn cấu hình, augmentation, epoch và checkpoint |
+|  test | 10.000 | 1.000 | Đánh giá cuối cùng sau khi khóa lựa chọn bằng validation |
 
-Không được sử dụng tập test để điều chỉnh augmentation, learning rate, epoch, lựa chọn kiến trúc hoặc checkpoint. Tập test chỉ dùng cho bước kiểm thử cuối cùng được mô tả trong [`demo.md`](demo.md).
+Train fit và validation cùng lấy từ **50.000 ảnh train gốc**, chia phân tầng theo lớp. Test lấy riêng bằng `CIFAR10(train=False)`. [Biểu đồ phân phối nhãn](assets/eda_class_distribution.png) đối chiếu số lượng trên.
 
-## 3. Tiền xử lý phù hợp với mô hình pre-trained
 
-Pre-trained models nhận đầu vào 3 kênh với kích thước lớn hơn 28 × 28 và được huấn luyện trên ảnh ImageNet. Chọn một pipeline chung cho cả ba kiến trúc để bảo đảm tính nhất quán khi so sánh:
+**Tránh rò rỉ dữ liệu:** thống kê cần fit, PCA và prototype chỉ học trên train fit. Không dùng validation/test để fit preprocessing; không dùng test để chọn mô hình hoặc augmentation. Các thống kê test đã có trong EDA chỉ phục vụ mô tả để đóng góp ý kiến cho việc cấu hình train chứ không quyết định hoàn toàn huấn luyện.
 
-```mermaid
-flowchart LR
-    A[Ảnh Fashion-MNIST<br/>1 × 28 × 28] --> B[Chuyển thành 3 kênh]
-    B --> C[Resize 224 × 224]
-    C --> D{Tập train?}
-    D -->|Có| E[Lật ngang ngẫu nhiên p = 0.5]
-    D -->|Không| F[Không augmentation]
-    E --> G[ToTensor và Normalize ImageNet]
-    F --> G
-    G --> H[Tensor 3 × 224 × 224]
-```
+## 3. Hợp đồng preprocessing
 
-| Bước | Training | Validation / Test |
+Áp dụng cho ba kiến trúc đã chọn: **ResNet18, VGG16 và DenseNet121**. Lựa chọn weights cụ thể thuộc [model.md](model.md); dữ liệu phải đi qua preprocessing khớp `weights.transforms()` của weights đó.
+
+| Bước / đầu ra | Yêu cầu |
+|---|---|
+| Ảnh đầu vào | Giữ RGB, không flatten hoặc chuyển grayscale trước CNN |
+| Resize và crop khi validation/test | Resize cạnh ngắn thành 256, giữ tỷ lệ; center crop 224×224; bilinear, antialias bật |
+| Chuyển kiểu | Pixel được chuyển thành `float32` trong `[0,1]` trước normalization |
+| Normalize | ImageNet mean `(0.485,0.456,0.406)`, std `(0.229,0.224,0.225)` theo thứ tự RGB |
+| Batch đưa vào mạng | `x`: `[B,3,224,224]`, `float32`, mọi giá trị hữu hạn; sau normalize không còn giới hạn trong `[0,1]` |
+| Batch nhãn | `y`: `[B]`, `torch.long`, giá trị 0–9, khớp từng ảnh |
+
+Các giá trị trên phải đối chiếu với preset của weights khi triển khai. Không thay resize/crop bằng kéo giãn trực tiếp về 224×224; không normalize hai lần hoặc thay ImageNet mean/std bằng thống kê CIFAR-10 khi chưa có thí nghiệm được đặc tả.
+
+Train được augmentation ngẫu nhiên theo [trainning.md](trainning.md), vẫn phải thỏa hợp đồng tensor cuối cùng. Tách dataset/transform train và validation để augmentation không lan sang validation; validation và test dùng cùng preprocessing tất định. Inference phải khớp preprocessing đã lưu cùng checkpoint, không suy đoán từ tên kiến trúc.
+
+## 4. Kết quả EDA và ý nghĩa sử dụng
+
+Nguồn: [báo cáo EDA HTML](../reports/eda_report.html), [số liệu JSON](../reports/eda_stats.json). Các số dưới đây đã đối chiếu JSON; số hiển thị làm tròn, phép tính phải dùng giá trị gốc trong artifact.
+
+### 4.1. Toàn vẹn dữ liệu
+
+| Phép kiểm tra trên dữ liệu gốc | Kết quả EDA |
+|---|---:|
+| Ảnh trùng hệt pixel trong train gốc / test | 0 / 0 |
+| Ảnh trùng hệt pixel giữa train gốc và test | 0 |
+| Nhãn mâu thuẫn trên ảnh trùng hệt trong train gốc | 0 |
+| Ảnh gần đen / gần trắng trong train gốc | 0 / 3 |
+
+EDA băm toàn bộ pixel mỗi ảnh để kiểm tra trùng tuyệt đối; chưa kiểm tra gần trùng về thị giác. “Gần đen/trắng” dùng brightness luma trung bình `<0.04` / `>0.96`, không đồng nghĩa ảnh hỏng hoặc sai nhãn. Giữ nguyên dataset và split; không tự loại ba ảnh sáng hoặc ảnh xa prototype chỉ theo các chỉ số này.
+
+### 4.2. Màu sắc và đặc trưng theo lớp
+
+Mean/std dưới đây tính trên pixel RGB đã chia 255 của **45.000 train fit**:
+
+| Kênh | Mean | Std |
+|---|---:|---:|
+| R | 0.49184 | 0.24705 |
+| G | 0.48254 | 0.24354 |
+| B | 0.44682 | 0.26169 |
+
+Đây là thống kê mô tả CIFAR-10, **không phải normalization thay thế cho pretrained**
+
+EDA còn đo brightness, contrast, saturation, colorfulness, edge và mean từng kênh trên train fit. Những quan sát hữu ích:
+
+- Brightness trung bình của `airplane` và `ship` là 0.556 và 0.521; `frog` có saturation trung bình cao nhất, 0.348. Biến đổi màu cần được kiểm tra để tránh làm mất tín hiệu nhận diện.
+- `automobile` và `truck` có edge trung bình 0.068 và 0.067; `airplane` là 0.046. Edge ở đây là trung bình sai khác tuyệt đối luma theo hai trục, không phải số cạnh Canny/Sobel; blur/crop mạnh có thể làm mất chi tiết nhỏ và cần kiểm chứng.
+- Tương quan Pearson contrast–edge là 0.543, saturation–colorfulness là 0.718. Các phép đo có liên hệ với nhau, không đủ để suy ra augmentation hoặc kiến trúc tối ưu.
+
+![Phân bố đặc trưng ảnh theo lớp trên train fit](assets/eda_class_feature_boxplots.png)
+
+*Thống kê từng lớp và tương quan đầy đủ nằm tại `metrics.feature_mean_by_class`, `feature_correlations_train` và báo cáo HTML. Chênh lệch màu/texture không dự đoán chính xác recall của CNN.*
+
+### 4.3. Prototype, giảm chiều và baseline EDA
+
+EDA average-pool ảnh 32×32 thành **8×8×3 = 192 chiều**. Descriptor này chỉ phục vụ phân tích
+| Phân tích | Kết quả đã quan sát | Giới hạn diễn giải |
 |---|---|---|
-| Chuyển kênh | `Grayscale(num_output_channels=3)` | Giống training |
-| Kích thước | `Resize((224, 224), BILINEAR)` | Giống training |
-| Augmentation | `RandomHorizontalFlip(p=0.5)` | Không có phép ngẫu nhiên |
-| Chuyển tensor | `ToTensor()` | `ToTensor()` |
-| Chuẩn hóa | ImageNet mean / std | Cùng mean / std|
+| Prototype lớp, fit trên train fit | Ba cặp gần nhất theo Euclidean: bird–horse 0.384; cat–dog 0.388; deer–frog 0.453 | Dùng làm giả thuyết để xem confusion matrix validation; chưa chứng minh CNN nhầm các cặp này |
+| PCA, fit trên train fit | 25 / 43 / 82 thành phần giữ 90% / 95% / 99% phương sai; PC1 giữ 35.40% | PCA của descriptor 192 chiều; không quyết định số tầng/filter của CNN |
+| t-SNE | 1.500 ảnh train fit, seed 42; PCA 30 chiều trước t-SNE | Hình dung lân cận descriptor, không phải learned embedding hoặc accuracy |
+| Nearest prototype | Validation accuracy 26.18% trên đủ 5.000 ảnh; prototype từ 45.000 train fit | Baseline mô tả RGB |
+| k-NN, k=5 + PCA50 | Fit trên mẫu 3.000 train fit, đánh giá mẫu 1.200 validation; accuracy 29.25% | Khác số mẫu với nearest prototype; không so trực tiếp như cùng một giao thức |
 
-Dùng thống kê chuẩn hóa ImageNet sau khi `ToTensor()` đưa pixel về `[0, 1]`:
+Hình đối chiếu: [prototype và độ biến thiên](assets/eda_rgb_prototypes.png), [độ giống prototype](assets/eda_prototype_similarity.png), [PCA](assets/eda_pca_variance_projection.png), [t-SNE](assets/eda_tsne_clusters.png), [baseline validation](assets/eda_knn_validation_baseline.png).
 
-```python
-IMAGENET_MEAN = (0.485, 0.456, 0.406)
-IMAGENET_STD  = (0.229, 0.224, 0.225)
-```
 
-Với mỗi kênh `c`, phép chuẩn hóa là:
 
-$$
-x'_c = \frac{x_c - \mu_c}{\sigma_c}, \qquad x_c \in [0,1].
-$$
+### 4.4. Khác biệt giữa các tập
 
-Việc chuyển từ ảnh xám sang 3 kênh không tạo thêm thông tin màu; nó chỉ giúp dữ liệu phù hợp với các tầng đầu vào của trọng số ImageNet. Tương tự, phóng ảnh từ 28 lên 224 pixel không làm tăng độ chi tiết vốn có của ảnh gốc.
+KS một chiều trên tám đặc trưng ảnh có giá trị lớn nhất:
 
-**Quyết định thiết kế:** sử dụng `Resize((224, 224))` thay vì crop ngẫu nhiên hoặc crop giữa ảnh, nhằm hạn chế cắt mất sản phẩm nhỏ. Pipeline này là lựa chọn thống nhất cho thí nghiệm của nhóm, không mặc nhiên trùng hoàn toàn với `weights.transforms()` mặc định của mọi phiên bản trọng số torchvision. AI phải ghi lại phiên bản weights đã dùng và kiểm tra yêu cầu preprocessing tương ứng; nếu thay pipeline, phải chạy lại các cấu hình liên quan để so sánh công bằng.
+| So sánh | KS lớn nhất | Đặc trưng |
+|---|---:|---|
+| Train fit–validation | 0.01904 | Mean Red |
+| Train fit– test, chỉ mô tả | 0.01364 | Brightness |
 
-## 4. Yêu cầu triển khai trong source
+[Biểu đồ đối chiếu phân phối](assets/eda_distribution_shift.png) và `metrics.distribution_comparison` chứa đủ tám phép đo. Chênh lệch quan sát nhỏ theo các đặc trưng đó; chưa chứng minh hai phân phối hoàn toàn giống nhau hoặc không có leakage. Giữ nguyên split và đánh giá riêng từng lớp; cấu hình huấn luyện và metrics cụ thể theo tài liệu sở hữu tương ứng.
 
-Đây là khung tham chiếu cho phần chuẩn bị dữ liệu; AI có thể tổ chức thành hàm nhưng không được thay đổi hành vi đã nêu ở trên.
+## 5. Artifact và điều kiện bàn giao dữ liệu
 
-```python
-from torch import Generator, randperm
-from torch.utils.data import Subset
-from torchvision import datasets, transforms
-from torchvision.transforms import InterpolationMode
-
-IMAGENET_MEAN = (0.485, 0.456, 0.406)
-IMAGENET_STD = (0.229, 0.224, 0.225)
-
-TRAIN_TRANSFORM = transforms.Compose([
-    transforms.Grayscale(num_output_channels=3),
-    transforms.Resize((224, 224), interpolation=InterpolationMode.BILINEAR),
-    transforms.RandomHorizontalFlip(p=0.5),
-    transforms.ToTensor(),
-    transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
-])
-
-EVAL_TRANSFORM = transforms.Compose([
-    transforms.Grayscale(num_output_channels=3),
-    transforms.Resize((224, 224), interpolation=InterpolationMode.BILINEAR),
-    transforms.ToTensor(),
-    transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
-])
-
-train_source = datasets.FashionMNIST("data", train=True, download=True,
-                                     transform=TRAIN_TRANSFORM)
-val_source = datasets.FashionMNIST("data", train=True, download=True,
-                                   transform=EVAL_TRANSFORM)
-test_data = datasets.FashionMNIST("data", train=False, download=True,
-                                  transform=EVAL_TRANSFORM)
-
-indices = randperm(60000, generator=Generator().manual_seed(1)).tolist()
-train_data = Subset(train_source, indices[:50000])
-val_data = Subset(val_source, indices[50000:])
-```
-
-**Lưu ý bắt buộc:** `train_source` và `val_source` đọc cùng ảnh gốc nhưng gắn hai transform riêng. Không dùng một dataset với `RandomHorizontalFlip` rồi `random_split()` thành train/validation
-
-Các chỉ số chia train/validation cần được lưu vào một file cố định, chẳng hạn `data/split_indices_seed1.pt`; lần chạy sau ưu tiên tải lại chỉ số này và kiểm tra tổng số ảnh thay vì chia lại. Không nhân bản 50.000 ảnh đã resize thành dữ liệu riêng trong RAM; transform được áp dụng khi `Dataset` trả về mẫu.
-
-## 5. DataLoader và nguyên tắc thực nghiệm
-
-`DataLoader` cần tuân thủ các quy tắc sau:
-
-- **Train:** `shuffle=True`; **validation/test:** `shuffle=False`. Không áp dụng augmentation ngẫu nhiên ngoài tập train.
-- `batch_size`, `num_workers` và `pin_memory` là tham số cấu hình, được chọn theo phần cứng và ghi lại trong log; không hard-code một batch size có thể gây hết bộ nhớ với VGG16.
-- Cùng một chiến lược preprocessing phải được dùng cho cả **feature extraction** và **fine-tuning**. Mọi thử nghiệm augmentation mới cần là một cấu hình có tên riêng, không âm thầm thay dữ liệu giữa các run.
-- Với batch ảnh, kiểm tra shape `[B, 3, 224, 224]`, dtype `float32`, giá trị hữu hạn và nhãn thuộc `[0, 9]` trước khi bắt đầu training.
-
-Do ảnh được tăng từ 28 × 28 lên 224 × 224 và từ 1 lên 3 kênh, chi phí bộ nhớ đầu vào tăng đáng kể so với LAB1. Nếu gặp lỗi thiếu VRAM, ưu tiên giảm `batch_size` hoặc dùng mixed precision ở bước huấn luyện; **không âm thầm đổi độ phân giải của riêng một model** rồi so sánh như cùng điều kiện.
-
-## 6. Tiêu chí nghiệm thu phần dữ liệu
-
-Chỉ được coi bước chuẩn bị dữ liệu hoàn thành khi kiểm tra được các điều kiện sau:
-
-- [ ] Tải đúng Fashion-MNIST, có **50.000 train / 10.000 validation / 10.000 test**.
-- [ ] Hai tập train và validation không trùng chỉ số; test là split chính thức độc lập.
-- [ ] Seed chia dữ liệu là `1`, có lưu và có thể khôi phục lại danh sách chỉ số.
-- [ ] Train và validation dùng hai transform khác nhau; validation/test luôn cho ra tensor xác định với cùng một ảnh.
-- [ ] Mẫu đầu vào có shape `[3, 224, 224]`, batch có shape `[B, 3, 224, 224]`; nhãn là số nguyên thuộc `0..9`.
-- [ ] Không có `NaN`/`Inf` sau normalization; tên và thứ tự 10 lớp không thay đổi.
-- [ ] Tất cả 6 lượt chạy cốt lõim(3 kiến trúc × 2 chiến lược) dùng cùng chỉ số chia tập và cùng preprocessing cơ sở.
-- [ ] Ghi lại cấu hình transform, seed, kích thước ảnh và phiên bản trọng số pre-trained để có thể chạy lại.
-
-Khi hoàn tất, phần dữ liệu cần cung cấp **ba đối tượng dataset hoặc DataLoader có thể sử dụng ngay** cho training, validation và test, cùng thông tin về phép chia.
-
+| Artifact | Vai trò |
+|---|---|
+| [EDA.py](../EDA.py) | Source EDA, custom theo cấu trúc tham chiếu [LAB1/EDA.py](../../LAB1/EDA.py) |
+| [data/splits.npz](../data/splits.npz) | Danh tính train fit/validation cố định |
+| [reports/eda_stats.json](../reports/eda_stats.json) | Nguồn số liệu đầy đủ và trạng thái các phân tích EDA |
+| [reports/eda_report.html](../reports/eda_report.html) | Báo cáo EDA HTML tự chứa để đọc offline và xem các hình/phân tích chi tiết |
+| `Docs/assets/eda_*.png` | Hình minh họa trích từ EDA, không thay thế số liệu JSON |
+6. Giao diện triển khai (nếu dùng dataset tự thu thập)
+- Triển khai chuyên nghiệp bằng cách kế thừa Dataset từ thư viện tourch , cùng cấp đầy đủ các hàm như _ _ len_ _, getitem()

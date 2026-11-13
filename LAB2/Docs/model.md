@@ -1,149 +1,147 @@
-# Practice 2 — Đặc tả mô hình và chiến lược Transfer Learning
+# LAB2 — Thiết kế mô hình pretrained
 
-*ResNet18 · VGG16 · DenseNet121 *
+Tài liệu đặc tả kiến trúc, luồng tensor, cách thay tầng phân loại trong [model.py](../model.py). Dữ liệu/preprocessing theo [data.md](data.md); cấu hình, điều phối run và lưu checkpoint theo [trainning.md](trainning.md).
 
-> **Mục đích tài liệu:** Quy định chính xác những mô hình mà nhóm yêu cầu AI xây dựng trong `Model.py`: nạp trọng số ImageNet, thay tầng phân loại cho Fashion-MNIST và cấu hình hai chế độ Feature Extraction / Partial Fine-tuning
+## 1. Kiến trúc lựa chọn
 
-## 1. Yêu cầu chung
+Dùng **ResNet18, VGG16 và DenseNet121**, mỗi mạng có hai giai đoạn nối tiếp: **feature extraction → partial fine-tuning**. 
 
-Nhóm lựa chọn ba kiến trúc CNN đã được huấn luyện trên ImageNet để khảo sát khả năng chuyển giao đặc trưng sang bài toán phân loại 10 lớp Fashion-MNIST. Cả ba mô hình phải giữ nguyên cấu trúc backbone gốc; chỉ thay classifier đầu ra và chủ động mở khóa một phần mạng trong thí nghiệm fine-tuning.
+| Kiến trúc | Nhiệm vụ đảm nhận | Weights enum từ `torchvision.models` |
+|---|---|---|
+| [ResNet18](https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html) | Làm mốc so sánh với hai kiến trúc còn lại về chất lượng và chi phí | `ResNet18_Weights.IMAGENET1K_V1` |
+| [VGG16](https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.vgg16.html) | Khảo sát đặc trưng convolution với chuỗi Conv 3×3 có cấu trúc rõ | `VGG16_Weights.IMAGENET1K_V1` |
+| [DenseNet121](https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.densenet121.html) | Khảo sát cơ chế truyền đặc trưng khác với residual bằng cách nối và tái sử dụng feature map từ các dense layer | `DenseNet121_Weights.IMAGENET1K_V1` |
 
-| Quy định | Yêu cầu bắt buộc |
+Giữ nguyên backbone của torchvision, gồm stem, convolution, pooling và các kết nối nội bộ. Thay tầng Linear cuối từ 1.000 lớp ImageNet thành **10 lớp CIFAR-10**. VGG16 dùng bản chuẩn `vgg16`, giữ hai FC pretrained; **head** trong tài liệu này chỉ tầng Linear cuối được thay.
+
+Không dùng `DEFAULT` thay cho enum đã khóa hoặc weights `IMAGENET1K_FEATURES` của VGG16. Feature extraction cần nạp đúng weights; khi cache/tải weights lỗi phải báo lỗi, không tiếp tục run pretrained bằng trọng số ngẫu nhiên.
+
+**Kỳ vọng cần kiểm chứng:** head mới học cách ánh xạ đặc trưng ImageNet sang CIFAR-10 sau đó fine-tuning bằng cách mở stage cuối để thử xem có thể giúp đặc trưng thích nghi thêm với dữ liệu mới hay không . Qua đó khảo sát xem fine-tuning tăng số tham số cập nhật thì có nguy cơ overfit hoặc làm suy giảm đặc trưng đã học hay không .
+
+## 2. Luồng tổng quan và input/output
+
+![Luồng tổng quan của ba kiến trúc](assets/model_overview.png)
+
+*Hình 1. Ảnh được chuẩn bị ngoài model; ba nhánh giữ backbone gốc và kết thúc bằng head 10 lớp. [Mở SVG](assets/model_overview.svg). Phần preprocessing trong hình minh họa luồng eval; augmentation train do `trainning.md` quy định.*
+
+| Giao tiếp của `CNN.forward(x)` | Yêu cầu |
 |---|---|
-| Nguồn mô hình | `torchvision.models` sử dụng trọng số pretrained  |
-| Phiên bản trọng số | Cố định `IMAGENET1K_V1` cho cả ba kiến trúc |
-| Đầu vào | Tensor `float32` hoặc tensor tương thích mixed precision, shape **`[B, 3, 224, 224]`** |
-| Đầu ra | 10 logits dạng `[B, 10]` không gắn `Softmax` vào cuối mô hình |
-| Cách xây dựng | Mỗi lượt chạy tạo một model mới từ cùng pretrained weights, không tái sử dụng model đã fine-tune |
-| Phạm vi | Không tự ý đổi backbone, thay kiến trúc bằng model nhỏ hơn hoặc train from scratch |
+| Input | Tensor float `[B,3,224,224]` sau preprocessing theo `data.md`; `B` là batch size |
+| Output | **Logits `[B,10]`**, cột thứ `k` ứng với lớp ID `k` theo `data.md` |
+| Flatten | Chỉ sau phần trích xuất/pooling theo luồng của từng kiến trúc |
+| Softmax | Không đặt trong `forward`; xác suất và nhãn dự đoán được xử lý ở bước [inference](demo.md) |
 
-Đầu vào, thứ tự nhãn và phép chuẩn hóa được định nghĩa tại [`data.md`](data.md). `Model.py` chỉ chịu trách nhiệm tạo và cấu hình mô hình, không tải Fashion-MNIST hoặc tổ chức training loop.
 
-## 2. Ba kiến trúc được lựa chọn
+## 3. Luồng chi tiết từng mạng
+Các hình dưới đọc từ trên xuống. Shape feature map theo thứ tự `[B,C,H,W]`. 
+- Màu xám: tham số pretrained đóng băng
+-  vàng: phần mở thêm khi fine-tune
+- xanh lá: head thay mới, tiếp tục được học ở cả hai giai đoạn. Đường đi của tensor vẫn qua các phần đóng băng.
+### 3.1. ResNet18 — nhánh residual
 
-![Luồng xử lý của ba mô hình pretrained](assets/model_overview.png)
+![Luồng ResNet18 và BasicBlock](assets/model_resnet18_flow.png)
 
-*Hình 1. Luồng đặc trưng của ba kiến trúc. Tất cả sử dụng cùng đầu vào và trả về `[B, 10]`, nhưng kích thước đặc trưng trước classification head khác nhau.*
+*Hình 2. Đủ bốn stage, shape sau từng stage và phép cộng trong BasicBlock. [Mở SVG](assets/model_resnet18_flow.svg).*
 
-| Kiến trúc | Đặc trưng cần khảo sát | Tầng phải thay | Classification head mới | Tổng tham số sau thay head¹ |
-|---|---|---|---|---:|
-| **ResNet18** | Kết nối tắt giúp thông tin đi qua các residual blocks | `model.fc` | `nn.Linear(512, 10)` | 11.181.642 |
-| **VGG16** | Các khối convolution xếp tuần tự, classifier gốc rất lớn | `model.classifier[6]` | `nn.Linear(4096, 10)` | 134.301.514 |
-| **DenseNet121** | Các tầng dùng lại feature maps thông qua dense connections | `model.classifier` | `nn.Linear(1024, 10)` | 6.964.106 |
+Mỗi stage `layer1`–`layer4` gồm hai BasicBlock. Một block tính `ReLU(F(x) + S(x))`, với `F` gồm hai Conv 3×3. Block đầu của `layer2`–`layer4` giảm phân giải bằng stride 2; nhánh tắt dùng Conv 1×1 và BatchNorm để khớp shape. Các block còn lại dùng identity.
 
-*¹ Số tham số của các kiến trúc torchvision tiêu chuẩn sau khi thay tầng 1.000 lớp ImageNet bằng tầng 10 lớp; được kiểm tra bằng `sum(p.numel() for p in model.parameters())`. Đây là **quy mô mô hình**, không phải số tham số được phép cập nhật hoặc dung lượng RAM thực tế.*
+Sau `layer4`, feature map `[B,512,7,7]` qua global average pooling và flatten thành `[B,512]`. Thay **`network.fc = Linear(512,10)`**. Giữ nguyên stem, các residual blocks và cách cộng hai nhánh.
 
-### 2.1. ResNet18
+### 3.2. VGG16 — chuỗi convolution và FC pretrained
 
-Đường truyền chính gồm stem, bốn stage `layer1`–`layer4`, global average pooling và `fc`. Residual blocks có nhánh cộng tắt:
+![Luồng VGG16 và đường gradient qua các FC đóng băng](assets/model_vgg16_flow.png)
 
-$$
-\mathbf{y} = \mathbf{x} + F(\mathbf{x})
-$$
+*Hình 3. Năm conv block, hai FC pretrained và head; nhánh bên phải chỉ đường gradient về block 5. [Mở SVG](assets/model_vgg16_flow.svg).*
 
-Nhóm giữ nguyên toàn bộ backbone pretrained và thay **duy nhất** `fc` để tạo 10 logits. Với input `[B, 3, 224, 224]`, vector ngay trước `fc` có dạng `[B, 512]`.
+Năm block có lần lượt **2/2/3/3/3 convolution**, tương ứng các khoảng `features[0:5]`, `[5:10]`, `[10:17]`, `[17:24]`, `[24:31]`. Mỗi convolution dùng kernel 3×3, stride 1, padding 1 và ReLU; cuối block có MaxPool 2×2, stride 2.
 
-### 2.2. VGG16
+Đầu ra features `[B,512,7,7]` qua adaptive average pooling 7×7 và flatten thành `[B,25088]`. Giữ `classifier[0:6]`: FC 25088→4096, ReLU, Dropout, FC 4096→4096, ReLU, Dropout. Chỉ thay **`network.classifier[6] = Linear(4096,10)`**.
 
-VGG16 sử dụng các block convolution tuần tự, sau đó đi qua `avgpool` và các tầng fully-connected trong `classifier`. Nhóm sử dụng `vgg16` tiêu chuẩn, không phải `vgg16_bn`, giữ nguyên `classifier[0]` đến `classifier[5]` và chỉ thay `classifier[6]` từ 1.000 đầu ra thành 10 đầu ra. Đặc trưng đầu vào tầng cuối có dạng `[B, 4096]`.
+Hai FC lớn vẫn chiếm bộ nhớ dù đóng băng. Khi mở block 5, gradient phải đi qua các FC này để về convolution; không dùng `no_grad()` hoặc `detach()` làm đứt đường đó.
 
-### 2.3. DenseNet121
+### 3.3. DenseNet121 — nối đặc trưng
 
-DenseNet121 truyền các feature maps từ những tầng trước đến tầng sau bằng phép nối kênh:
+![Luồng DenseNet121 và phép concatenation](assets/model_densenet121_flow.png)
 
-$$
-\mathbf{x}_{\ell} = H_{\ell}([\mathbf{x}_0,\mathbf{x}_1,\ldots,\mathbf{x}_{\ell-1}])
-$$
+*Hình 4. Bốn dense block, ba transition và một bước tạo/nối đặc trưng. [Mở SVG](assets/model_densenet121_flow.svg).*
 
-Nhóm giữ nguyên `model.features` pretrained và thay `model.classifier` thành `nn.Linear(1024, 10)`. Sau global average pooling, vector đặc trưng có dạng `[B, 1024]`.
+Bốn dense block gồm **6/12/24/16 dense layer**, growth rate `k=32`. Mỗi dense layer nhận các đặc trưng trước đó, thực hiện BN→ReLU→Conv 1×1 với 128 kênh, rồi BN→ReLU→Conv 3×3 tạo 32 kênh mới. Dense block nối chúng theo chiều kênh với các đặc trưng đã có.
 
-## 3. Hai chiến lược cần triển khai
+Mỗi transition dùng BN→ReLU→Conv 1×1→AvgPool 2×2 để giảm kênh và phân giải. Đầu ra block cuối `[B,1024,7,7]` qua `norm5`, ReLU, global average pooling và flatten thành `[B,1024]`. Thay **`network.classifier = Linear(1024,10)`**; giữ nguyên dense connections và transitions.
 
-Mỗi kiến trúc phải được chạy độc lập với hai chế độ sau
+## 4. Hai giai đoạn nối tiếp và chính sách trainable
 
-![So sánh Feature Extraction và Partial Fine-tuning](assets/model_training_modes.png)
+![Chuyển từ feature extraction sang fine-tuning cho từng mạng](assets/model_training_modes.png)
 
-*Hình 2. Màu xám: tham số được đóng băng*
+*Hình 5. Mũi tên nét đứt chuyển toàn bộ trọng số từ best checkpoint train head sang giai đoạn fine-tuning. [Mở SVG](assets/model_training_modes.svg).*
 
-*màu vàng: tầng cuối backbone được mở khóa*
+1. **Feature extraction:** nạp weights ImageNet đầy đủ, đóng băng các tham số pretrained, thay head 10 lớp và chỉ train head. Chọn best checkpoint bằng validation theo `trainning.md`.
+2. **Partial fine-tuning:** dựng đúng kiến trúc/head, nạp **toàn bộ best checkpoint feature extraction** bằng `strict=True`, giữ nguyên head đã học và mở thêm phần cuối theo bảng dưới. Tiếp tục train từ các trọng số vừa nạp.
 
-*màu xanh: classification head mới luôn được huấn luyện.*
-
-| Thành phần | `feature_extract` | `fine_tune` |
+| Kiến trúc | Feature extraction: phần trainable | Fine-tuning: phần trainable |
 |---|---|---|
-| Backbone giai đoạn đầu | Đóng băng | Đóng băng |
-| Backbone giai đoạn cuối | Đóng băng | Mở khóa theo bảng dưới |
-| Classification head mới | Trainable| Trainable |
-| Trọng số khởi tạo | Pretrained ImageNet | pretrained ImageNet |
+| ResNet18 | `network.fc` | `network.layer4` + `network.fc` |
+| VGG16 | `network.classifier[6]` | `network.features[24:]` + `network.classifier[6]` |
+| DenseNet121 | `network.classifier` | `network.features.denseblock4` + `network.features.norm5` + `network.classifier` |
 
-Phạm vi mở khóa trong chế độ `fine_tune` được chốt như sau:
+Các tham số còn lại luôn đóng băng. Fine-tuning tiếp từ đúng checkpoint của cùng kiến trúc; không nạp lại ImageNet hoặc khởi tạo lại head sau khi chuyển giai đoạn. Trước optimizer step đầu tiên của fine-tuning, toàn bộ `state_dict` phải bằng checkpoint cha. Đổi `requires_grad` không được đổi giá trị trọng số.
 
-| Kiến trúc | Các module được phép cập nhật khi fine-tune | Những phần còn lại |
-|---|---|---|
-| ResNet18 | `model.layer4` và `model.fc` mới | Giữ nguyên |
-| VGG16 | `model.features[24:]` và `model.classifier[6]` mới | Giữ nguyên các block convolution đầu và classifier pretrained trước tầng cuối |
-| DenseNet121 | `model.features.denseblock4`, `model.features.norm5` và `model.classifier` mới | Giữ nguyên |
+**BatchNorm:** giữ mọi BatchNorm của backbone ở `eval()` trong cả hai giai đoạn để cố định running mean/variance. Affine weight/bias của BatchNorm thuộc phần mở khóa vẫn trainable, gồm `norm5` của DenseNet121. `requires_grad=False` và chế độ train/eval là hai cơ chế riêng; quy tắc này phải được áp dụng lại sau mỗi lần gọi `model.train()`. Cơ chế running statistics tham chiếu [BatchNorm2d](https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html).
 
-**Quy tắc bắt buộc khi đóng băng:**
+**Dropout:** giữ Dropout pretrained trong `classifier[0:6]` của VGG16 ở `eval()` ở cả hai giai đoạn để phần FC đóng băng không tạo nhiễu ngẫu nhiên. Đây là lựa chọn của LAB2 so với chế độ train thông thường của VGG16; tác động tới khả năng tổng quát hóa cần đánh giá thực tế.
 
-- Đặt `requires_grad=False` cho **toàn bộ tham số pretrained trước**, sau đó thay head mới và chỉ mở khóa các module có tên trong bảng. Không chỉ freeze backbone rồi vô tình để những tầng fully-connected pretrained của VGG16 tiếp tục cập nhật.
-- `requires_grad=False` **không tự đóng băng running mean/variance của BatchNorm**. Để hành vi nhất quán với batch size nhỏ, nhóm chọn giữ **mọi BatchNorm của backbone ở chế độ `eval()`** trong cả hai chiến lược; các tham số affine thuộc module đã mở khóa vẫn có thể nhận gradient. Sau mỗi lần gọi `model.train()`, cơ chế này phải được áp dụng lại.
-- Với VGG16, `Dropout` nằm trong phần `classifier` pretrained đã đóng băng phải ở chế độ `eval()` để đường truyền đặc trưng cố định, trong khi head mới vẫn train bình thường.
-- **Không gọi `model.eval()` cho toàn bộ model trong training.** Việc đánh giá trên validation/test mới chuyển toàn bộ model sang `eval()` theo quy trình ở [`trainning.md`](trainning.md).
+**Autograd:** tham số đóng băng không nhận cập nhật, nhưng phép toán của chúng vẫn phải giữ gradient tới phần trainable phía trước. Chỉ đưa tham số trainable vào optimizer, tách head/backbone không trùng hoặc thiếu. Khi validation/test, toàn bộ model ở `eval()`.
 
-Trong chế độ `feature_extract`, chỉ có head mới nhận gradient. Ở `fine_tune`, cả head và stage cuối backbone nhận gradient; các nhóm tham số này phải được nhận diện riêng để training có thể gán learning rate phù hợp mà không làm thay đổi lựa chọn kiến trúc.
+## 5. Giao diện triển khai theo form 
 
-## 4. Danh sách 6 thí nghiệm cốt lõi
-
-Tên cấu hình phải ổn định xuyên suốt source, checkpoint, TensorBoard và báo cáo.
-
-| Run ID | Backbone | Chế độ | Phần được huấn luyện |
-|---|---|---|---|
-| `01_resnet18_feature_extract` | ResNet18 | Feature extraction | `fc` mới |
-| `02_resnet18_fine_tune` | ResNet18 | Fine-tuning | `layer4` + `fc` mới |
-| `03_vgg16_feature_extract` | VGG16 | Feature extraction | `classifier[6]` mới |
-| `04_vgg16_fine_tune` | VGG16 | Fine-tuning | `features[24:]` + `classifier[6]` mới |
-| `05_densenet121_feature_extract` | DenseNet121 | Feature extraction | `classifier` mới |
-| `06_densenet121_fine_tune` | DenseNet121 | Fine-tuning | `denseblock4` + `norm5` + `classifier` mới |
-
-Đây là **sáu thí nghiệm bắt buộc**, không phải sáu kiến trúc khác nhau. Thí nghiệm bổ sung về learning rate, batch size hoặc mức độ unfreeze (nếu có) phải có ID riêng và được mô tả tại [`trainning.md`](trainning.md).
-
-
-**Quy định triển khai:**
-
-1. Dùng API `weights=...`, **không dùng** `pretrained=True`. Cố định đúng các enum `ResNet18_Weights.IMAGENET1K_V1`, `VGG16_Weights.IMAGENET1K_V1` và `DenseNet121_Weights.IMAGENET1K_V1`; không dùng weights của VGG16 biến thể `IMAGENET1K_FEATURES`.
-2. Kiểm tra giá trị `architecture`, `mode`, `num_classes` và báo lỗi rõ ràng nếu không hợp lệ; với bài LAB này `num_classes=10`.
-3. Sau khi thay head và cấu hình freeze, cho phép kiểm tra `total_params` và `trainable_params`; không hard-code các giá trị này vào kết quả xuất ra.
-4. Phải có cách lấy riêng hai nhóm **trainable head** và **trainable backbone**, để `Train.py` xây dựng optimizer đúng. Không đưa các tham số `requires_grad=False` vào danh sách cần tối ưu.
-5. Mỗi lần gọi `build_model()` phải khởi tạo một model độc lập. Việc tái lập trọng số head mới bằng seed sẽ do phần điều phối thí nghiệm quản lý.
-6. Khi không tải được pretrained weights (mạng lỗi hoặc chưa có cache), báo lỗi và hướng dẫn chuẩn bị weights; **không tự fallback sang `weights=None`** rồi tiếp tục báo cáo là transfer learning.
-
-Hợp đồng đầu ra quan trọng nhất:
+Dùng một lớp `nn.Module`, khai báo mạng trong `__init__`, Gọi trực tiếp model qua `forward`. Lớp `CNN` bọc kiến trúc torchvision được chọn, giữ nguyên luồng nội bộ của kiến trúc đó.
 
 ```python
-x = torch.randn(2, 3, 224, 224)
-logits = model(x)       # [2, 10] — chưa qua Softmax
+CNN(architecture="resnet18", num_classes=10,
+    pretrained=True, fine_tune=False)
 ```
 
-`CrossEntropyLoss` nhận trực tiếp `logits`. Việc tính loss, optimizer, scheduler, checkpoint và đánh giá thuộc tài liệu khác; không triển khai trong `Model.py`.
+| Tham số | Ý nghĩa |
+|---|---|
+| `architecture` | `"resnet18"`, `"vgg16"` hoặc `"densenet121"`; giá trị khác phải báo lỗi |
+| `num_classes` | Số đầu ra, bằng `10` cho LAB2; giá trị không hợp lệ phải báo lỗi |
+| `pretrained` | `True` để bắt đầu feature extraction từ ImageNet; `False` khi sẽ nạp checkpoint đầy đủ cho fine-tuning, resume hoặc inference |
+| `fine_tune` | `False`: chỉ head trainable; `True`: áp dụng phạm vi mở khóa ở mục 4 |
 
-## 6. Tiêu chí nghiệm thu phần mô hình
+- **`__init__`:** chọn builder/weights, đóng băng tham số pretrained, thay head đúng số chiều và áp dụng freeze policy.
+- **`forward(self, x)`:** trả `self.network(x)`; không thêm preprocessing hoặc Softmax.
+- **`train(self, mode=True)`:** chuyển mode qua `nn.Module`, áp dụng lại chính sách BatchNorm/Dropout, trả `self` để giữ cách dùng chuẩn `model.train()` / `model.eval()`.
 
-AI chỉ được xem `Model.py` là hoàn thành khi toàn bộ điều kiện sau được kiểm chứng:
+Ví dụ phần chuyển giai đoạn, sau khi training đã kiểm tra checkpoint cha:
 
-- [ ] Cả ba model tải đúng **ImageNet-pretrained weights `IMAGENET1K_V1`**, không phải mạng khởi tạo ngẫu nhiên.
-- [ ] Thay đúng `fc`, `classifier[6]` và `classifier` tương ứng; cả ba trả về shape `[B, 10]` với batch size bất kỳ phù hợp bộ nhớ.
-- [ ] Với `feature_extract`, **chỉ head mới** có `requires_grad=True`; các tham số gốc đều được đóng băng.
-- [ ] Với `fine_tune`, **chỉ head và stage cuối được chỉ định** có `requires_grad=True`; những tầng khác giữ nguyên.
-- [ ] Các BatchNorm của backbone giữ running statistics cố định khi training; các Dropout pretrained đã đóng băng trong VGG16 không tạo nhiễu ngẫu nhiên.
-- [ ] Cùng một ảnh có thể chạy forward ở cả 6 cấu hình; output hữu hạn, không có `NaN` hoặc `Inf`.
-- [ ] Kiểm tra backward trên một batch: head có gradient ở cả hai chế độ; stage cuối có gradient **chỉ trong `fine_tune`**; tham số đóng băng không có gradient.
-- [ ] In được tổng số tham số, số tham số trainable và danh sách module được mở khóa; kết quả khớp với cấu hình.
-- [ ] Kiểm tra `train()/eval()` chuyển chế độ đúng, đặc biệt với BatchNorm/Dropout thuộc phần frozen.
-- [ ] Không chỉnh sửa pipeline đầu vào đã chốt trong [`data.md`](data.md) hoặc tự thay kiến trúc vì giới hạn phần cứng.
+```python
+model = CNN(architecture=architecture, num_classes=10,
+            pretrained=False, fine_tune=True)
+model.load_state_dict(parent_checkpoint["model_state_dict"], strict=True)
+model = model.to(device)
+```
 
-**Đầu ra yêu cầu:** `Model.py` chứa hàm tạo và cấu hình model; sáu run ID tương ứng ở trên; một bài kiểm tra tối thiểu về forward, freeze/unfreeze và gradient. Kết quả accuracy hay tốc độ không được dự đoán trước trong tài liệu này; chúng sẽ được thu thập và phân tích tại [`evaluation.md`](evaluation.md).
+`fine_tune=True` **chỉ cấu hình trainable**, không tự tìm hoặc nạp checkpoint. Phần training chịu trách nhiệm kiểm tra đúng checkpoint cha và nạp trước khi cập nhật trọng số. Danh sách `Config_parameter`, run ID, optimizer/scheduler mới khi chuyển giai đoạn và việc resume cùng run được quy định tại [trainning.md](trainning.md), theo cách tổ chức [LAB1/Train.py](../../LAB1/Train.py).
 
----
+`model.py` chỉ phụ trách dựng mạng, forward, freeze policy và hỗ trợ khảo sát/nhóm tham số. Không đặt DataLoader, vòng lặp epoch hoặc xuất báo cáo trong lớp `CNN`. Số liệu cấu trúc cần xuất gồm tên module, tên/shape tham số, số lượng và trạng thái trainable; đường dẫn output do tài liệu training quy định.
 
-*Tham chiếu API chính thức: [ResNet18](https://docs.pytorch.org/vision/main/models/generated/torchvision.models.resnet18.html) · [VGG16](https://docs.pytorch.org/vision/main/models/generated/torchvision.models.vgg16.html) · [DenseNet121](https://docs.pytorch.org/vision/main/models/generated/torchvision.models.densenet121.html).*
+## 6. Đối chiếu cấu trúc và điều kiện nghiệm thu
+
+Số tham số sau khi thay head 10 lớp, đếm từ `CNN` hiện có bằng `model.parameters()`:
+
+| Kiến trúc | Tổng tham số | Trainable: feature extraction | Trainable: fine-tuning |
+|---|---:|---:|---:|
+| ResNet18 | 11.181.642 | 5.130 | 8.398.858 |
+| VGG16 | 134.301.514 | 40.970 | 7.120.394 |
+| DenseNet121 | 6.964.106 | 10.250 | 2.170.378 |
+
+Tổng không gồm buffers như running statistics. Mở stage cuối vẫn có thể cập nhật hàng triệu tham số; bảng này không thay thế phép đo thời gian hoặc peak RAM/VRAM khi chạy thật.
+
+Trước nghiệm thu source cần xác minh:
+
+1. Cả sáu cấu hình có cấu trúc và shape trung gian khớp hình, forward trả logits hữu hạn `[B,10]`; nạp pretrained đúng enum, đủ weights và thay đúng head.
+2. Tên tham số trainable đúng bảng mục 4. Sau backward/step, phần mở khóa có gradient/cập nhật, phần đóng băng không đổi; gradient của VGG16 đi được về block 5.
+3. BatchNorm giữ buffers cố định; affine ở phần mở khóa vẫn nhận gradient. Dropout VGG16 tuân thủ policy sau cả chuỗi `train()`→`eval()`→`train()`.
+4. Chuyển giai đoạn giữ nguyên toàn bộ trọng số từ best checkpoint cha, gồm head; ở eval với cùng input, logits trước optimizer step đầu tiên khớp model cha trong sai số số học phù hợp.
+5. In được cấu trúc và số tham số để đối chiếu bảng trên; nạp lại checkpoint đầy đủ bằng `strict=True` tái tạo đúng kiến trúc và đầu ra.
+

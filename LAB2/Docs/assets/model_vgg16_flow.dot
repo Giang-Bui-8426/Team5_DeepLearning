@@ -1,0 +1,32 @@
+digraph model_vgg16_flow {
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans"];
+  v0 [label="Input đã preprocessing\n[B,3,224,224]", fillcolor="#E6F0FF"];
+  v1 [label="Block 1 · features[0:5]\n2 Conv 64 + ReLU → MaxPool\n[B,64,112,112]", fillcolor="#EDF2F7"];
+  v2 [label="Block 2 · features[5:10]\n2 Conv 128 + ReLU → MaxPool\n[B,128,56,56]", fillcolor="#EDF2F7"];
+  v3 [label="Block 3 · features[10:17]\n3 Conv 256 + ReLU → MaxPool\n[B,256,28,28]", fillcolor="#EDF2F7"];
+  v4 [label="Block 4 · features[17:24]\n3 Conv 512 + ReLU → MaxPool\n[B,512,14,14]", fillcolor="#EDF2F7"];
+  v5 [label="Block 5 · features[24:31]\n3 Conv 512 + ReLU → MaxPool\n[B,512,7,7]", fillcolor="#FFF0CD"];
+  v6 [label="AdaptiveAvgPool(7×7) → Flatten\n[B,512,7,7] → [B,25088]", fillcolor="#FFFFFF"];
+  v7 [label="FC1 · classifier[0:3]\nLinear 25088→4096 → ReLU → Dropout\n[B,4096]", fillcolor="#EDF2F7"];
+  v8 [label="FC2 · classifier[3:6]\nLinear 4096→4096 → ReLU → Dropout\n[B,4096]", fillcolor="#EDF2F7"];
+  v9 [label="classifier[6] mới · Linear 4096 → 10\nLogits [B,10] · không Softmax", fillcolor="#DEF5E9"];
+  kernel [label="Mỗi convolution\nKernel 3×3 · stride 1 · padding 1\nReLU sau từng Conv", fillcolor="#FFFFFF"];
+  pool [label="Cuối mỗi block\nMaxPool 2×2 · stride 2\nGiảm một nửa chiều cao/rộng", fillcolor="#FFFFFF"];
+  gv1 [label="Block 5 mở khóa\nfeatures[24:]", fillcolor="#FFF0CD"];
+  gv2 [label="FC1 / FC2 đóng băng\nclassifier[0:6] · giữ autograd", fillcolor="#EDF2F7"];
+  gv3 [label="Head mới → loss\nclassifier[6] trainable", fillcolor="#DEF5E9"];
+  v0 -> v1;
+  v1 -> v2;
+  v2 -> v3;
+  v3 -> v4;
+  v4 -> v5;
+  v5 -> v6;
+  v6 -> v7;
+  v7 -> v8;
+  v8 -> v9;
+  kernel -> pool;
+  gv1 -> gv2;
+  gv2 -> gv3;
+  gv3 -> gv1 [style=dashed];
+}

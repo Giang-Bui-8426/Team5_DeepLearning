@@ -1,207 +1,180 @@
-# Practice 2 — Đặc tả quy trình huấn luyện
+# LAB2 — Cấu hình, thực thi và đầu ra training
 
-*Transfer Learning · ResNet18 / VGG16 / DenseNet121 · PyTorch*
+Tài liệu sở hữu cấu hình thí nghiệm, augmentation, tối ưu hóa, tracking, checkpoint và báo cáo training. Dữ liệu/split theo [data.md](data.md), kiến trúc và freeze policy theo [model.md](model.md). Test/inference thuộc [demo.md](demo.md).
 
-> **Vai trò tài liệu:** Nhóm quy định cách tổ chức sáu thí nghiệm, tối ưu trọng số, theo dõi TensorBoard, quản lý checkpoint và đo tài nguyên. Kiến trúc và các tầng được phép cập nhật tuân theo [`model.md`](model.md); dữ liệu tuân theo [`data.md`](data.md).
+## 1. Bộ thí nghiệm và luồng chạy
 
-## 1. Mục tiêu và nguyên tắc thực nghiệm
+Danh sách `Config_parameter` gồm các `dict`, mỗi phần tử có `name`, `architecture`, `fine_tune`, `warm_start_from` và cấu hình bên dưới. Hàm điều phối khởi tạo `CNN` trực tiếp, dùng chung vòng train/validation; không đưa vòng epoch vào lớp model.
 
-So sánh ba kiến trúc pretrained trên Fashion-MNIST bằng hai chiến lược: **feature extraction** và **partial fine-tuning**. Vì mỗi kiến trúc có chi phí tính toán khác nhau, quá trình huấn luyện phải ghi nhận cả chất lượng dự đoán lẫn thời gian và bộ nhớ sử dụng
+| Kiến trúc | Train head từ ImageNet | Fine-tune từ best của run bên trái |
+|---|---|---|
+| ResNet18 | `01_resnet18_feature_extract` | `02_resnet18_fine_tune` |
+| VGG16 | `03_vgg16_feature_extract` | `04_vgg16_fine_tune` |
+| DenseNet121 | `05_densenet121_feature_extract` | `06_densenet121_fine_tune` |
 
-Các yêu cầu chung:
+Chạy mặc định **01→02→03→04→05→06** ở feature extraction. Khi chạy riêng fine-tune phải có parent đã kết thúc hợp lệ; thiếu/sai parent thì báo lỗi.
 
-- Sáu run bắt buộc sử dụng cùng **50.000 ảnh train / 10.000 ảnh validation**, cùng split seed `1`, đầu vào `[B, 3, 224, 224]` và phép chuẩn hóa ImageNet. Seed khởi tạo và xáo trộn cho mỗi run , được đặt một lần lúc bắt đầu run, không đặt lại theo mỗi epoch.
-- Mỗi run khởi tạo một model độc lập từ ImageNet `IMAGENET1K_V1`. Run fine-tuning tiếp tục từ checkpoint của run feature extraction.
-- Mỗi run dùng cùng quy tắc đánh giá, lựa chọn checkpoint và Early Stopping. Các thông số thay đổi phải có ID thí nghiệm riêng.
-- Không âm thầm giảm kích thước ảnh, đổi backbone, tắt pretrained weights hoặc bỏ qua run không chạy được.
+![Luồng train, chuyển giai đoạn và tổng hợp kết quả](assets/training_workflow.png)
 
-## 2. Danh sách thí nghiệm và cấu hình mặc định
+*Hai giai đoạn nối tiếp và vòng epoch dùng chung. Phạm vi mở khóa theo `model.md`. [Mở SVG](assets/training_workflow.svg).*
 
-| Run ID | Kiến trúc | Chế độ | Tham số được cập nhật |
-|---|---|---|---|
-| `01_resnet18_feature_extract` | ResNet18 | Feature extraction | `fc` mới |
-| `02_resnet18_fine_tune` | ResNet18 | Fine-tuning | `layer4` + `fc` mới |
-| `03_vgg16_feature_extract` | VGG16 | Feature extraction | `classifier[6]` mới |
-| `04_vgg16_fine_tune` | VGG16 | Fine-tuning | `features[24:]` + `classifier[6]` mới |
-| `05_densenet121_feature_extract` | DenseNet121 | Feature extraction | `classifier` mới |
-| `06_densenet121_fine_tune` | DenseNet121 | Fine-tuning | `denseblock4` + `norm5` + `classifier` mới |
+## 2. Augmentation và nạp dữ liệu
 
-Phạm vi freeze/unfreeze là hợp đồng bắt buộc trong [`model.md`](model.md). `Train.py` không được tự thay đổi danh sách này.
+### 2.1. Augmentation
 
-### Cấu hình tối ưu hóa đề xuất để triển khai lần đầu
+Dùng thống nhất cho train của cả sáu run và hai giai đoạn. Các giá trị là cấu hình xuất phát cần kiểm chứng bằng validation, chưa phải tham số tối ưu.
 
-| Tham số | Feature extraction | Partial fine-tuning |
-|---|---:|---:|
-| Optimizer | AdamW | AdamW |
-| Learning rate của head mới | `1e-3` | `5e-4` |
-| Learning rate của backbone được mở khóa | Không áp dụng | `1e-5` |
-| Weight decay | `1e-4` | `1e-4` |
-| Train batch size | `32` | `32` |
-| Validation batch size | `64` | `64` |
-| Giới hạn epochs | `20` | `20` |
-| Scheduler | `CosineAnnealingLR` | `CosineAnnealingLR` |
-| `T_max` / `eta_min` | `10` / `1e-6` | `10` / `1e-6` |
-| Early Stopping | Patience `5` | Patience `5` |
+| Thứ tự | Phép biến đổi | Thông số và kiểu dữ liệu |
+|---:|---|---|
+| 1 | `RandomResizedCrop` | Từ ảnh PIL RGB gốc: output `224`, `scale=(0.70,1.00)`, `ratio=(0.90,1.10)`, bilinear, `antialias=True` |
+| 2 | `RandomHorizontalFlip` | `p=0.5` |
+| 3 | `RandomApply([ColorJitter(...)])` | `p=0.8`; brightness `0.3`, contrast `0.3`, saturation `0.2`, hue `0.05` |
+| 4 | `ToTensor` → `Normalize` | Lấy mean/std từ preset của weights đã chọn theo `data.md`, chỉ normalize một lần |
+| 5 | `RandomErasing` | Trên tensor đã normalize: `p=0.25`, `scale=(0.02,0.12)`, `ratio=(0.5,2.0)`, `value=0`, `inplace=False` |
+
+- Crop thay đổi vùng và tỷ lệ quan sát;
+- jitter thay đổi màu/độ sáng;
+- erasing mô phỏng che khuất cục bộ. `scale` của crop/erasing là **tỷ lệ diện tích**, không phải tỷ lệ độ dài cạnh. Giá trị xóa `0` sau normalization tương ứng màu mean chuẩn hóa. Giới hạn crop và vùng xóa nhằm giảm nguy cơ mất vật thể trên ảnh gốc nhỏ; chưa có bảo đảm mọi ảnh sau biến đổi đều giữ đủ tín hiệu nhận diện.
+
+> ColorJitter thực hiện trước normalization; RandomErasing thực hiện sau bước chuyển thành tensor. Train xây pipeline riêng từ các thành phần trên, không ghép thêm toàn bộ `weights.transforms()` sau đó làm crop/normalize lại. Validation chỉ dùng eval preset theo `data.md`.
 
 
-## 3. Luồng huấn luyện bắt buộc
 
-```mermaid
-flowchart TD
-    A[Đọc cấu hình và cố định seed] --> B[DataLoader từ cùng split 50k / 10k]
-    B --> C[build_model: pretrained weights + head 10 lớp]
-    C --> D[Freeze / unfreeze đúng theo mode]
-    D --> E[Tạo optimizer, scheduler và AMP]
-    E --> F{Có last checkpoint hợp lệ?}
-    F -->|Có| G[Khôi phục trạng thái và epoch]
-    F -->|Không| H[Khởi tạo lượt chạy mới]
-    G --> I[Train một epoch]
-    H --> I
-    I --> J[Validate, không cập nhật trọng số]
-    J --> K[Ghi TensorBoard, thời gian và bộ nhớ]
-    K --> L{Val accuracy cải thiện?}
-    L -->|Có| M[Lưu checkpoint_best.pt]
-    L -->|Không| N[Giữ best checkpoint hiện tại]
-    M --> O[Cập nhật scheduler và lưu last_checkpoint.pt]
-    N --> O
-    O --> P{Early Stopping hoặc đủ epochs?}
-    P -->|Không| I
-    P -->|Có| Q[Trả về best metrics của run]
-```
+Trước full training, tạo **một ảnh preview** gồm ảnh gốc và nhiều biến thể từ chính pipeline sẽ train, lấy mẫu đủ mười lớp, seed cố định. Lưu `reports/augmentation_preview.png`
 
-*Mỗi run có thư mục log và checkpoint riêng. Trạng thái của epoch cuối phải được ghi trước khi kết thúc vì Early Stopping.*
+### 2.2. DataLoader và tái lập
 
-## 4. Loss, optimizer và cập nhật trọng số
-
-Bài toán có 10 lớp và đầu ra là logits `[B, 10]`, nên nhóm chọn **Cross-Entropy Loss**, không thêm `Softmax` vào đầu ra của model và không gọi `softmax` trước `nn.CrossEntropyLoss()`.
-
-$$
-\mathcal{L}_{\mathrm{CE}}
-=-\frac{1}{B}\sum_{i=1}^{B}
-\log\frac{\exp(z_{i,y_i})}{\sum_{k=0}^{9}\exp(z_{i,k})}
-$$
-
-**Thiết lập mặc định:** `nn.CrossEntropyLoss(label_smoothing=0.0, reduction="mean")`. Chưa đưa class weights hoặc focal loss vào sáu run chính vì Fashion-MNIST có các lớp tương đối cân bằng; thử loss khác phải được định nghĩa thành thí nghiệm mới.
-
-Một batch được xử lý theo thứ tự: `zero_grad` → forward → tính loss → backward → gradient clipping → optimizer step. Chỉ những tham số `requires_grad=True` mới được đưa vào optimizer:
-
-- **Feature extraction:** một nhóm tham số head, LR `1e-3`.
-- **Fine-tuning:** hai nhóm riêng: backbone được mở khóa với LR `1e-5`, head mới với LR `5e-4`.
-- Gradient clipping: `max_norm=1.0`, áp dụng **sau khi unscale gradient** nếu dùng FP16 AMP.
-- Scheduler cập nhật **một lần sau mỗi epoch**, không cập nhật theo từng batch.
-
-### Mixed precision
-
-Trên CUDA, mặc định bật AMP cho cả sáu run để giảm chi phí xử lý; sử dụng API `torch.amp.autocast("cuda")` và `torch.amp.GradScaler("cuda")` khi dùng FP16. Nếu không có CUDA, chạy FP32 và không bật CUDA AMP. AI cần ghi `device`, `amp_enabled` và dtype thực tế của mỗi run
-
-Sau mỗi `model.train()`, phải áp dụng lại chính sách từ `model.md`: BatchNorm thuộc backbone giữ ở `eval()` để không cập nhật running statistics; Dropout trong các tầng pretrained đã đóng băng của VGG16 giữ `eval()`. Không chuyển toàn bộ model sang `eval()` trong bước training vì head và những tầng được mở khóa vẫn cần nhận gradient.
-
-### Loss trung bình của một epoch
-
-Loss của từng batch do `CrossEntropyLoss` trả về là **giá trị trung bình**, không phải tổng. Do batch cuối có thể ít ảnh hơn, phải tính trung bình theo số lượng mẫu:
-
-$$
-L_{\mathrm{epoch}}
-=\frac{\sum_{b=1}^{M} n_b L_b}{\sum_{b=1}^{M} n_b}
-$$
-
-Trong đó `n_b` là số ảnh của batch `b`, `L_b` là loss trung bình của batch đó. Không lấy trung bình đơn giản của mọi `L_b` nếu kích thước batch không bằng nhau.
-
-## 5. Validation, lưu mô hình tốt nhất và dừng sớm
-
-Sau mỗi epoch, chạy trên **toàn bộ 10.000 ảnh validation** với `model.eval()` và `torch.inference_mode()`. Không gọi backward, không cập nhật optimizer và không áp dụng augmentation ngẫu nhiên. Model phải được chuyển lại sang chế độ train đúng chính sách freeze ở epoch tiếp theo.
-
-| Quyết định | Tiêu chí được chốt |
+| Thành phần | Quy định |
 |---|---|
-| Best checkpoint của một run | **Validation accuracy cao nhất**; chỉ cập nhật khi lớn hơn `best_accuracy` trước đó |
-| Early Stopping | **Validation loss** không cải thiện ít nhất `1e-4` trong `3` epochs liên tiếp |
-| Global-best giữa sáu run | So sánh **best validation accuracy** của từng run; nếu bằng nhau, ưu tiên macro F1 cao hơn |
+| Dataset/split | Dùng đúng artifact và kiểm tra theo `data.md`; không chia lại hoặc lọc bớt mẫu |
+| Train/validation dataset | Hai object `CIFAR10(train=True)` với transform riêng, áp `Subset` bằng chỉ số tương ứng |
+| Train / validation batch | `16` / `32` cho core run |
+| Shuffle / drop last | Train shuffle, validation không shuffle; cả hai `drop_last=False` |
+| Workers / pin memory | `num_workers=4` theo điều chỉnh được duyệt khi chạy thực nghiệm; pin memory khi CUDA, tắt trên CPU |
+| Seed | `42` cho Python, NumPy, Torch/CUDA, generator của DataLoader khi bắt đầu run mới |
+| Determinism | `cudnn.benchmark=False`, `cudnn.deterministic=True`; lưu cấu hình thực tế |
 
-Accuracy, loss, precision, recall và F1 dùng để mô tả **cùng epoch của best checkpoint**. Không ghép `best accuracy` của epoch này với `minimum loss` của epoch khác thành một hàng dữ liệu. `best_epoch` phải lưu theo quy ước **bắt đầu từ 1**.
+Training chỉ nạp train fit/validation theo `data.md`; không tạo test loader. Augmentation không nhân số mẫu mỗi epoch: mỗi ảnh train được lấy một lần và biến đổi khi đọc.
 
-Khi kiểm tra Early Stopping, cần ghi log và lưu checkpoint của epoch hiện tại **trước** khi `break`. Dừng sớm không có nghĩa là lấy trọng số epoch cuối; đầu ra dùng để so sánh là `checkpoint_best.pt`.
+Seed kiểm soát các nguồn ngẫu nhiên, không bảo đảm tái lập tuyệt đối giữa phần cứng/phiên bản. Resume khôi phục RNG, không reseed về đầu. Nếu tăng workers sau này, phải kiểm soát seed worker và kiểm chứng lại tính tái lập.
 
-## 6. Checkpoint và tiếp tục huấn luyện
+## 3. Cấu hình tối ưu hóa
 
-Đề xuất cây thư mục:
+| Tham số | Feature extraction | Fine-tuning |
+|---|---|---|
+| `lr_head` / `lr_backbone` | `1e-3` / `None` | `1e-4` / `1e-5` |
+| Optimizer | AdamW: weight decay `1e-4`, betas `(0.9,0.999)`, eps `1e-8` | Cùng cấu hình, tạo mới khi chuyển giai đoạn |
+| Epoch tối đa | `10` | `10`, tính riêng giai đoạn |
+| Scheduler | CosineAnnealingLR, `T_max=epochs`, `eta_min=1e-6` | Scheduler mới với cùng quy tắc |
+| Early Stopping | Validation loss, patience `3`, min delta `1e-4` | Bộ đếm mới với cùng quy tắc |
+| Loss | CrossEntropyLoss từ logits, reduction `mean`, label smoothing `0.0`, không class weights | Cùng định nghĩa |
+| Gradient clipping | L2 norm, `max_norm=1.0`, chỉ tham số trainable | Cùng quy tắc |
+| Precision train | CUDA: FP16 AMP, GradScaler initial scale `1024`; CPU: FP32 | Cùng quy tắc |
+| Precision validation | FP32 | FP32 |
+
+Nhóm optimizer chỉ gồm tham số `requires_grad=True`: `head` và, khi fine-tune, `backbone` theo `model.md`; không trùng/thiếu tham số. Kiến trúc/freeze policy không được thay để xử lý thiếu bộ nhớ.
+
+Các giá trị trên là cấu hình khởi đầu. Batch 16 phải được smoke test trên thiết bị thực tế, đặc biệt VGG16. Nếu OOM, giữ artifact hợp lệ và ghi lỗi; thay batch qua cấu hình mới với output riêng. Bộ so sánh core phải thống nhất batch và policy; không âm thầm giảm batch/resolution trong một run.
+
+## 4. Vòng epoch, metrics và selection
+
+1. Gọi `model.train()` và áp freeze/BatchNorm/Dropout policy trong `model.md`.
+2. Mỗi batch: `zero_grad(set_to_none=True)` → forward → loss → backward → clip → optimizer step. CUDA dùng autocast và GradScaler: **unscale trước clip**, sau đó scaler step/update. CPU chạy FP32. Ghi số AMP update bị bỏ qua; lỗi loss không hữu hạn hoặc cả epoch không có update hợp lệ phải dừng và ghi nguyên nhân. Tham chiếu [AMP examples](https://docs.pytorch.org/docs/2.7/notes/amp_examples.html).
+3. Validation dùng `model.eval()` và `torch.inference_mode()`, xử lý đủ tập, không backward hoặc augmentation ngẫu nhiên.
+4. Tổng hợp metrics, cập nhật best/dừng sớm; log LR thực dùng, step scheduler một lần cuối epoch; lưu history và checkpoint rồi mới kết thúc nếu đạt điều kiện dừng.
+
+**Tổng hợp theo mẫu:** `epoch_loss = sum(batch_loss * batch_size) / total_images`; accuracy = tổng dự đoán đúng/tổng ảnh. Không lấy trung bình đều các batch khi batch cuối nhỏ. Train loss/accuracy phản ánh các ảnh đã augmentation và trọng số thay đổi trong epoch; không diễn giải chênh train–validation như hai phép đo trên cùng điều kiện.
+
+| Dữ liệu metrics | Định nghĩa/yêu cầu lưu |
+|---|---|
+| Train | Loss, accuracy, số mẫu, gradient norm trước clip (mean/max), tỷ lệ bị clip, số AMP update bị bỏ |
+| Validation | Loss, accuracy, macro precision/recall/F1; confusion matrix và precision/recall/F1/support từng lớp |
+| Macro metrics | Trung bình không trọng số trên đủ nhãn 0–9, `zero_division=0`; accuracy và metrics tỷ lệ lưu `[0,1]` |
+| ROC/AUC validation | One-vs-rest từ xác suất Softmax, AUC từng lớp/macro/micro; lớp thiếu positive hoặc negative thì để thiếu và ghi lý do |
+| FPR validation | Từng lớp one-vs-rest: `FP/(FP+TN)`; macro là trung bình trên lớp hợp lệ, không phải `1-accuracy` |
+
+Các biểu đồ/báo cáo dùng đúng class order và đủ số mẫu. Thông tin không tính được lưu `null`/`N/A`, không dựng đường ROC hoặc giá trị 0 giả.
+
+| Quyết định | Quy tắc |
+|---|---|
+| Best checkpoint của run | Validation accuracy cao nhất; hòa giữ epoch sớm đã lưu |
+| Reset Early Stopping | `val_loss < best_val_loss - 1e-4`; nếu không thì tăng counter, dừng khi counter đạt 3 |
+| Global best | Chỉ xét sáu core run hợp lệ đã kết thúc: accuracy giảm dần → macro-F1 giảm dần → loss tăng dần → run ID từ điển |
+
+Epoch đánh số từ **1 trong từng giai đoạn**. Best và Early Stopping tách biệt; metric trong hàng best phải cùng epoch/checkpoint, không ghép minimum loss của epoch khác. Fine-tuning có thể kém train head; selection vẫn xét cả hai. Chỉ xuất global best khi đủ sáu core run và checkpoint/metadata nhất quán; bộ thiếu ghi rõ chưa hoàn tất.
+
+## 5. Chuyển giai đoạn, checkpoint và resume
+
+| Thành phần | Bắt đầu fine-tuning | Resume cùng run |
+|---|---|---|
+| Nguồn model | Best checkpoint của parent theo mục 1 | `last_checkpoint.pt` của chính run đang dở |
+| Kiểm tra | Parent đã kết thúc; đúng architecture, classes, split, eval transform và nguồn thực nghiệm; xác minh hash, kiểm tra policy của parent/đích theo cấu hình run | Đúng run/config, architecture/mode, split, transform/augmentation, nhóm optimizer và nguồn code tương thích |
+| Trọng số | Nạp toàn bộ `state_dict`, giữ head theo `model.md` | Nạp toàn bộ state của run |
+| Optimizer/scheduler/scaler | Tạo mới | Khôi phục đầy đủ |
+| Epoch/best/counter | Epoch 1, best và counter mới | Epoch tiếp sau checkpoint, giữ best/counter |
+| RNG | Seed của run mới | Khôi phục Python/NumPy/Torch/CUDA và generator sau khi dựng/load các đối tượng, trước batch tiếp |
+
+
+
+| Nhóm dữ liệu trong checkpoint | Nội dung bắt buộc |
+|---|---|
+| Định danh | `architecture`, `mode`, `config`, `epoch`, `best_epoch`, `status`, `is_smoke` |
+| Dữ liệu/preprocessing | `dataset`, `classes`, `transform_spec`, `augmentation_spec` |
+| Trạng thái học | `model_state_dict` đầy đủ cả buffers, `optimizer_state_dict`, `scheduler_state_dict`, `scaler_state_dict`, RNG và DataLoader generator |
+| Lịch sử/selection | `history` tới epoch hoàn thành, `best_accuracy`, `best_metrics`, `best_val_loss` của dừng sớm và `early_stopping_counter` |
+
+Best checkpoint lưu model tại best epoch , last lưu trạng thái epoch hoàn thành gần nhất **sau scheduler step** dùng để resume ở ranh giới epoch. Gián đoạn giữa epoch chỉ tiếp tục từ last đã hoàn thành, không coi batch dang dở là epoch đã xong. Đồng bộ history và TensorBoard theo checkpoint, loại record/step phát sinh sau mốc khôi phục để không nhân đôi.
+
+## 6. Tracking, tài nguyên và bộ output
+
+Mỗi run có SummaryWriter riêng, epoch là global step; ghi config/lineage bằng text, flush cuối epoch và close khi kết thúc. Các nhóm scalar cần có:
+
+| Nhóm tag | Giá trị |
+|---|---|
+| `Loss/*`, `Train/accuracy`, `Validation/*` | Train/validation loss, accuracy và macro precision/recall/F1 |
+| `Optimization/*` | LR head/backbone thực dùng, gradient norm mean/max trước clip, tỷ lệ clip, số AMP update bị bỏ; bỏ LR backbone ở feature extraction |
+| `Performance/*` | Giây train/validation riêng, số ảnh/giây tương ứng |
+| `Resources/train_*`, `Resources/val_*` | Peak CUDA allocated/reserved MiB và CPU RSS peak quan sát được theo mỗi phần |
+
+Đo bằng `perf_counter()`, đồng bộ CUDA trước/sau vùng đo; reset peak CUDA riêng trước train/validation. Thời gian gồm đọc/augmentation batch và tính toán của phần tương ứng, tách khỏi tải weights, setup và xuất báo cáo. RSS lấy mẫu theo batch là peak quan sát của process chính; không phải peak RAM toàn hệ thống. Không có CUDA/không đo được thì lưu thiếu, không suy bộ nhớ từ số tham số. Ghi gián đoạn sleep/hibernate nếu xảy ra và không diễn giải elapsed đó như tốc độ chạy liên tục.
+
+Tất cả đường dẫn sau neo vào **`<output_root>`**, độc lập thư mục terminal:
 
 ```text
-LAB2/
-├── checkpoints/
-│   ├── 01_resnet18_feature_extract/
-│   │   ├── checkpoint_best.pt
-│   │   └── last_checkpoint.pt
-│   ├── 02_resnet18_fine_tune/
-│   ├── 03_vgg16_feature_extract/
-│   ├── 04_vgg16_fine_tune/
-│   ├── 05_densenet121_feature_extract/
-│   ├── 06_densenet121_fine_tune/
-│   └── checkpoint_best_global.pt
-├── logs/<run_id>/
-└── reports/
+checkpoints/<run_id>/checkpoint_best.pt
+checkpoints/<run_id>/last_checkpoint.pt
+checkpoints/checkpoint_best_global.pt
+logs/<run_id>/
+reports/<run_id>/history.json
+reports/<run_id>/architecture.txt
+reports/<run_id>/best_validation.npz
+reports/augmentation_preview.png
+reports/run_summary.csv
+reports/selection.json
+reports/report_all_models.html
 ```
 
-Mỗi checkpoint cần lưu **ít nhất**: `run_id`, `architecture`, `mode`, `epoch`, `config`, `model_state_dict`, `optimizer_state_dict`, `scheduler_state_dict`, `scaler_state_dict` (nếu AMP), `best_epoch`, `best_accuracy`, `best_metrics`, `best_val_loss` và `early_stopping_counter`. `last_checkpoint.pt` phải đủ để resume; `checkpoint_best.pt` phải đủ để khôi phục model cho inference.
+- `history.json`: metadata/config/lineage và một record mỗi epoch, đủ metrics, số mẫu, LR, thời gian, tài nguyên và quyết định best/dừng. Trạng thái: `running`, `completed`, `early_stopped`, `interrupted`, `failed`; summary dùng `pending` cho run chưa bắt đầu.
+- `architecture.txt`: cấu trúc mạng, tên/shape/số lượng tham số và trainable flag theo `model.md`.
+- `best_validation.npz`: `y_true` và `y_prob` của đủ validation, thứ tự theo `val_indices`, ứng với đúng best epoch; không lưu predictions epoch cuối thay cho best.
+- `run_summary.csv`: đủ sáu run cùng trạng thái; best epoch/metrics, số epoch, params, cấu hình/precision/device, parent/hash, tổng thời gian và peak tài nguyên. Fine-tuning có chi phí riêng giai đoạn và tổng cả chuỗi; throughput = tổng mẫu/tổng thời gian. Parent thiếu thì tổng chuỗi là thiếu, không cộng như 0.
+- `selection.json`: rule, danh sách xếp hạng core, run/epoch được chọn, checkpoint SHA-256 và split identity; phải khớp bản sao `checkpoint_best_global.pt`.
 
-Quy tắc resume:
+## 7. Báo cáo HTML tổng hợp sau train
 
-1. Kiểm tra `run_id`, pretrained weights, input size và cấu hình optimizer/scheduler khớp với checkpoint trước khi tiếp tục.
-2. Khôi phục model, optimizer, scheduler, AMP scaler, epoch và trạng thái Early Stopping; không chỉ tải trọng số model.
-3. Không load `checkpoint_best.pt` chồng lên model vừa khôi phục từ `last_checkpoint.pt`.
-4. Lưu file qua đường dẫn tạm rồi `os.replace()` để hạn chế checkpoint hỏng khi ghi dở.
-5. Nếu thay learning rate, chế độ fine-tuning hoặc số epochs mục tiêu, ghi thành **run mới** thay vì giả định resume tương đương tiếp tục lượt chạy cũ.
+**Bắt buộc xuất `reports/report_all_models.html` từ history thực tế sau khi các run được chọn kết thúc**, đồng thời giữ TensorBoard để theo dõi lúc chạy. Một file HTML chung chứa log/diễn biến và kết quả train–validation; không tạo thêm HTML riêng cho từng model.
 
-Để tăng tính tái lập, lưu cả seed, phiên bản PyTorch/torchvision, định danh GPU và trạng thái RNG nếu cần resume sát với lần chạy liên tục. Chỉ tải checkpoint từ nguồn đáng tin cậy.
+Kế thừa/custom [LAB1/TrainReport.py](../../LAB1/TrainReport.py) thành [LAB2/TrainReport.py](../TrainReport.py), giữ form và tương tác hữu ích. LAB2 chạy độc lập, không import LAB1 lúc thực thi hoặc sửa source LAB1.
 
-## 7. TensorBoard, thời gian và bộ nhớ
 
-Mỗi run phải có log riêng. Những trường sau là **đầu ra bắt buộc của `Train.py`**, không chỉ là gợi ý:
 
-| Nhóm log | Dữ liệu cần ghi |
-|---|---|
-| `Loss/train_epoch`, `Loss/validation` | Loss trung bình trên toàn bộ ảnh của tập tương ứng, theo epoch |
-| `Validation/accuracy`, `Validation/f1_macro` | Chất lượng phân loại trên validation |
-| `Validation/precision_macro`, `Validation/recall_macro` | Chỉ số bổ sung để phân tích các lớp |
-| `Optimization/lr_head`, `Optimization/lr_backbone` | Learning rate thực tế của từng nhóm trainable (bỏ lr backbone nếu feature extraction) |
-| `Performance/train_seconds`, `Performance/val_seconds` | **Thời gian riêng** cho train và validation ở mỗi epoch |
-| `Performance/train_images_per_second`, `Performance/val_images_per_second` | Thông lượng thực tế, tính bằng số ảnh / thời gian tương ứng |
-| `Resources/train_peak_cuda_allocated_mib`, `Resources/val_peak_cuda_allocated_mib` | Peak VRAM tensor đo riêng cho hai giai đoạn (CUDA) |
-| `Resources/train_peak_cuda_reserved_mib`, `Resources/val_peak_cuda_reserved_mib` | Peak bộ nhớ PyTorch allocator dành riêng trên GPU |
-| `Resources/cpu_rss_observed_peak_mib` | RSS lớn nhất quan sát được khi lấy mẫu trong run (nếu có `psutil`) |
+HTML phải có:
 
-**Quy tắc đo:** dùng `time.perf_counter()`; trên CUDA gọi `torch.cuda.synchronize()` trước và sau đoạn cần đo để tránh sai số do GPU chạy bất đồng bộ. Đặt lại peak thống kê CUDA **riêng trước train và trước validation**, sau đó đọc `max_memory_allocated()` và `max_memory_reserved()` khi từng giai đoạn kết thúc. Nếu dùng `psutil`, lấy mẫu RSS trong các batch và ghi **đỉnh RSS quan sát được**, không gọi đó là đỉnh RAM tuyệt đối của hệ thống. Đo thời gian train/validation **không gồm** lần tải pretrained weights từ Internet hay thời gian tạo model. Nếu không có CUDA hoặc không đo được RAM, ghi `N/A` — tuyệt đối **không thay bằng ước lượng từ số tham số**.
+1. **Bảng so sánh và trạng thái:** sáu run, best epoch và metrics cùng checkpoint. Có architecture/mode, parent, policy augmentation, params, cấu hình thực tế, timing/resources và tổng chi phí chuỗi.
+2. **Tab từng run:** train/validation loss, accuracy, macro-F1, LR, gradient/clipping, thời gian và tài nguyên qua epoch. Hiển thị epoch tốt nhất, lý do dừng, config và lineage; confusion matrix, per-class metrics và ROC validation từ artifact hợp lệ.
+3. **Tương tác theo form LAB1:** bật/tắt đường, tooltip, zoom/reset, sort bảng, sáng/tối, xuất CSV/ảnh, hiển thị tốt trên màn hình hẹp. Không đo được thì ghi `N/A`, không vẽ thành số 0. Preview augmentation có thể nhúng từ ảnh đã lưu.
+4. **Một file mở offline:** nhúng dữ liệu, CSS/JS và hình cần thiết, không CDN, TensorBoard server hoặc phụ thuộc file nằm cạnh. Mang riêng HTML sang thư mục khác vẫn dùng được.
 
-Ngoài TensorBoard, xuất `reports/run_summary.csv` gồm `run_id`, mode, best epoch, best accuracy/F1/loss, số tham số tổng/trainable, số epochs thực tế, tổng thời gian train, tổng thời gian validation, thông lượng và peak RAM/VRAM nếu đo được. Phần phân tích, xếp hạng và trực quan hóa dữ liệu này thuộc [`evaluation.md`](evaluation.md), không viết kết luận thực nghiệm trong tài liệu thiết kế.
+Log/history lưu sau mỗi epoch, không đợi cuối bộ run mới lưu. Có thể cập nhật HTML sau từng run; khi chỉ chạy một phần hoặc bị ngắt phải ghi đúng trạng thái/thiếu run, không giả hoàn tất. Mọi biểu đồ/bảng chỉ dùng train/validation; official test trình bày theo `demo.md`. Dựng lại HTML từ history phải giữ nguyên số liệu, không chạy inference hoặc train lại.
 
-## 8. Điều chỉnh hyperparameters có kiểm soát
-
-Sau sáu run cốt lõi, nhóm cần khảo sát **learning rate và batch size** theo yêu cầu bài thực hành. Để tiết kiệm thời gian, dùng `02_resnet18_fine_tune` làm cấu hình đối chứng và tạo các run riêng:
-
-| Run bổ sung | Thay đổi duy nhất so với `02_resnet18_fine_tune` | Mục đích |
-|---|---|---|
-| `07_resnet18_fine_tune_lr` | LR head `2e-4`, LR backbone giữ `1e-5` | Kiểm tra ảnh hưởng LR của head |
-| `08_resnet18_fine_tune_bs8` | Train batch size `8` thay vì `16` | Kiểm tra ảnh hưởng batch size |
-
-Tất cả yếu tố khác (data split, weights, augmentation, optimizer, seed và tiêu chí chọn best) phải giữ nguyên. Nếu muốn đánh giá độ ổn định thay vì một lần chạy ngẫu nhiên, bổ sung các seed khác như thí nghiệm độc lập, không ghi đè kết quả cũ.
-
-## 9. Hợp đồng triển khai và tiêu chí nghiệm thu
-
-`Train.py` cần có các chức năng tối thiểu: xây dựng DataLoader theo `data.md`, tạo model qua `build_model()` của `Model.py`, cấu hình optimizer theo chế độ, train một epoch, validate, ghi TensorBoard, quản lý checkpoint/resume và điều phối danh sách thí nghiệm. Code phải hỗ trợ chạy **một run bằng ID** hoặc **toàn bộ sáu run**; có tùy chọn `--run`, `--epochs`, `--train-batch-size`, `--workers`, `--device`, `--fresh`/`--resume` được kiểm tra hợp lệ. Không cần tạo quá nhiều hàm nhỏ nếu không giúp rõ trách nhiệm.
-
-AI chỉ được coi phần huấn luyện đáp ứng đặc tả khi:
-
-- [ ] Cả 6 run khởi tạo độc lập với pretrained weights ImageNet đúng phiên bản và trả về logits `[B, 10]`.
-- [ ] Chỉ đúng các tham số được phép trong [`model.md`](model.md) nhận gradient; BatchNorm/Dropout của phần frozen không thay đổi trạng thái ngoài dự kiến.
-- [ ] Training và validation dùng cùng split nhưng transform khác nhau; tập test chưa được sử dụng.
-- [ ] Optimizer có nhóm LR đúng cho head và backbone; scheduler cập nhật theo epoch; AMP và gradient clipping không gây lỗi.
-- [ ] Train/validation loss tính theo số ảnh; accuracy và macro F1 được tính trên toàn bộ validation.
-- [ ] `checkpoint_best.pt` lưu đúng epoch đạt validation accuracy cao nhất; `last_checkpoint.pt` khôi phục được tiến độ, scheduler, AMP và Early Stopping.
-- [ ] TensorBoard cho thấy loss, accuracy, learning rate, **thời gian train/validation riêng** và **peak VRAM/RAM thực đo hoặc N/A**.
-- [ ] Báo cáo CSV có đủ sáu run, số tham số trainable, epochs thực tế và thông tin phần cứng; không đưa số liệu giả định vào kết quả thực nghiệm.
-- [ ] Có bài chạy thử **1 batch forward/backward + 1 lượt validation ngắn** trước khi khởi động sáu thí nghiệm đầy đủ; phát hiện lỗi shape, freeze và OOM sớm.
-
-**Đầu ra mong đợi:** `Train.py` có thể chạy và resume từng run, tạo checkpoint/log/CSV nhất quán; các số liệu đủ để đối chiếu chiến lược feature extraction và fine-tuning trong `evaluation.md` mà không cần truy ngược đo thủ công.
-
----
-
-**Tham chiếu kỹ thuật:** [PyTorch AMP](https://docs.pytorch.org/docs/stable/amp.html) · [PyTorch CUDA memory statistics](https://docs.pytorch.org/docs/stable/generated/torch.cuda.memory.max_memory_allocated.html) · [TensorBoard trong PyTorch](https://docs.pytorch.org/docs/stable/tensorboard.html).
+Nghiệm thu HTML bằng mở trình duyệt offline, thử các control và màn hình hẹp, di chuyển một bản sao HTML sang thư mục riêng; đối chiếu tối thiểu ba ô bảng và ba điểm biểu đồ với history/checkpoint. Báo lỗi nếu xuất HTML thất bại, dù checkpoint đã có.

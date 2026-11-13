@@ -2,6 +2,7 @@
 
 # Python: cache, build, test
 __pycache__/
+Training_Aqua/
 *.py[cod]
 *.pyo
 .pytest_cache/
@@ -38,10 +39,16 @@ Desktop.ini
 *~
 
 # Downloaded datasets and TensorBoard event logs (LAB1 & LAB2)
-**/data/
-**/logs/
 **/runs/
+**/data/
+**/weights/
+**/logs/
+**/smoke/
+**/archives/
+**/checkpoints/
+**/.tools/
 events.out.tfevents.*
+*.pt
 
 # Model-specific HTML reports: keep only the aggregate training HTML
 # (and unrelated HTML such as an EDA report, if present).
@@ -50,8 +57,6 @@ events.out.tfevents.*
 # Checkpoints: ignore all contents except each model's best
 # and the global best used by Predict.py.
 **/checkpoints/**/*
-!**/checkpoints/**/
-!**/checkpoints/**/checkpoint_best.pt
 !**/checkpoints/**/checkpoint_best_global.pt
 
 # General temporary files

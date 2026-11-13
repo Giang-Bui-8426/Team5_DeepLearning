@@ -1,0 +1,35 @@
+digraph model_densenet121_flow {
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans"];
+  d0 [label="Input đã preprocessing\n[B,3,224,224]", fillcolor="#E6F0FF"];
+  d1 [label="Stem · Conv 7×7/s2 → BN/ReLU → Pool\n64 kênh · [B,64,56,56]", fillcolor="#EDF2F7"];
+  d2 [label="denseblock1 · 6 dense layers\n64 + 6×32 = 256 · [B,256,56,56]", fillcolor="#EDF2F7"];
+  d3 [label="transition1 · Conv 1×1 → AvgPool\n256→128 kênh · [B,128,28,28]", fillcolor="#EDF2F7"];
+  d4 [label="denseblock2 · 12 dense layers\n128 + 12×32 = 512 · [B,512,28,28]", fillcolor="#EDF2F7"];
+  d5 [label="transition2 · Conv 1×1 → AvgPool\n512→256 kênh · [B,256,14,14]", fillcolor="#EDF2F7"];
+  d6 [label="denseblock3 · 24 dense layers\n256 + 24×32 = 1024 · [B,1024,14,14]", fillcolor="#EDF2F7"];
+  d7 [label="transition3 · Conv 1×1 → AvgPool\n1024→512 kênh · [B,512,7,7]", fillcolor="#EDF2F7"];
+  d8 [label="denseblock4 · 16 dense layers\n512 + 16×32 = 1024 · [B,1024,7,7]", fillcolor="#FFF0CD"];
+  d9 [label="norm5 → ReLU\n[B,1024,7,7]", fillcolor="#FFF0CD"];
+  d10 [label="Global average pooling → Flatten\n[B,1024,1,1] → [B,1024]", fillcolor="#FFFFFF"];
+  d11 [label="classifier mới · Linear 1024 → 10\nLogits [B,10] · không Softmax", fillcolor="#DEF5E9"];
+  di [label="Nối đặc trưng đã có\nx = concat(x0, …, xℓ−1)\n[B,C,H,W]", fillcolor="#E6F0FF"];
+  dc1 [label="BN → ReLU → Conv 1×1\nBottleneck 4k = 128 kênh", fillcolor="#FFFFFF"];
+  dc2 [label="BN → ReLU → Conv 3×3\nThêm k = 32 kênh mới", fillcolor="#FFFFFF"];
+  dcat [label="Concatenate theo chiều kênh\nconcat(x, đặc trưng mới)\n[B,C+32,H,W]", fillcolor="#E6F0FF"];
+  d0 -> d1;
+  d1 -> d2;
+  d2 -> d3;
+  d3 -> d4;
+  d4 -> d5;
+  d5 -> d6;
+  d6 -> d7;
+  d7 -> d8;
+  d8 -> d9;
+  d9 -> d10;
+  d10 -> d11;
+  di -> dc1;
+  dc1 -> dc2;
+  dc2 -> dcat;
+  di -> dcat [style=dashed];
+}

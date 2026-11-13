@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="864pt" height="849.6pt" viewBox="0 0 864 849.6" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.0, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 849.6
+L 864 849.6
+L 864 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 47.088 209.4264
+L 422.928 209.4264
+Q 430.704 209.4264 430.704 201.78
+L 430.704 155.052
+Q 430.704 147.4056 422.928 147.4056
+L 47.088 147.4056
+Q 39.312 147.4056 39.312 155.052
+L 39.312 201.78
+Q 39.312 209.4264 47.088 209.4264
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 47.088 294.3864
+L 422.928 294.3864
+Q 430.704 294.3864 430.704 286.74
+L 430.704 240.012
+Q 430.704 232.3656 422.928 232.3656
+L 47.088 232.3656
+Q 39.312 232.3656 39.312 240.012
+L 39.312 286.74
+Q 39.312 294.3864 47.088 294.3864
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 235.008 209.4264
+L 235.008 230.118458
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 225.318458
+L 235.008 230.118458
+L 232.608 225.318458
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 47.088 379.3464
+L 422.928 379.3464
+Q 430.704 379.3464 430.704 371.7
+L 430.704 324.972
+Q 430.704 317.3256 422.928 317.3256
+L 47.088 317.3256
+Q 39.312 317.3256 39.312 324.972
+L 39.312 371.7
+Q 39.312 379.3464 47.088 379.3464
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 235.008 294.3864
+L 235.008 315.078458
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 310.278458
+L 235.008 315.078458
+L 232.608 310.278458
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 464.4 209.4264
+L 840.24 209.4264
+Q 848.016 209.4264 848.016 201.78
+L 848.016 155.052
+Q 848.016 147.4056 840.24 147.4056
+L 464.4 147.4056
+Q 456.624 147.4056 456.624 155.052
+L 456.624 201.78
+Q 456.624 209.4264 464.4 209.4264
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 464.4 294.3864
+L 840.24 294.3864
+Q 848.016 294.3864 848.016 286.74
+L 848.016 240.012
+Q 848.016 232.3656 840.24 232.3656
+L 464.4 232.3656
+Q 456.624 232.3656 456.624 240.012
+L 456.624 286.74
+Q 456.624 294.3864 464.4 294.3864
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 652.32 209.4264
+L 652.32 230.118458
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 654.72 225.318458
+L 652.32 230.118458
+L 649.92 225.318458
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 464.4 379.3464
+L 840.24 379.3464
+Q 848.016 379.3464 848.016 371.7
+L 848.016 324.972
+Q 848.016 317.3256 840.24 317.3256
+L 464.4 317.3256
+Q 456.624 317.3256 456.624 324.972
+L 456.624 371.7
+Q 456.624 379.3464 464.4 379.3464
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 652.32 294.3864
+L 652.32 315.078458
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 654.72 310.278458
+L 652.32 315.078458
+L 649.92 310.278458
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 82.08 479.1744
+L 781.92 479.1744
+Q 789.696 479.1744 789.696 471.528
+L 789.696 418.8528
+Q 789.696 411.2064 781.92 411.2064
+L 82.08 411.2064
+Q 74.304 411.2064 74.304 418.8528
+L 74.304 471.528
+Q 74.304 479.1744 82.08 479.1744
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #def5e9; stroke: #52a582; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 235.008 379.3464
+L 430.619458 410.139476
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 426.251061 407.022249
+L 430.619458 410.139476
+L 425.504639 411.763858
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 652.32 379.3464
+L 433.383901 410.162014
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 438.471557 411.869574
+L 433.383901 410.162014
+L 437.802543 407.116426
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 47.088 570.5064
+L 422.928 570.5064
+Q 430.704 570.5064 430.704 562.86
+L 430.704 516.132
+Q 430.704 508.4856 422.928 508.4856
+L 47.088 508.4856
+Q 39.312 508.4856 39.312 516.132
+L 39.312 562.86
+Q 39.312 570.5064 47.088 570.5064
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 464.4 570.5064
+L 840.24 570.5064
+Q 848.016 570.5064 848.016 562.86
+L 848.016 516.132
+Q 848.016 508.4856 840.24 508.4856
+L 464.4 508.4856
+Q 456.624 508.4856 456.624 516.132
+L 456.624 562.86
+Q 456.624 570.5064 464.4 570.5064
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 432 479.1744
+L 236.39118 507.436157
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 241.485043 509.125111
+L 236.39118 507.436157
+L 240.798661 504.374439
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 432 479.1744
+L 650.933975 507.456949
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 646.481016 504.461759
+L 650.933975 507.456949
+L 645.866048 509.222202
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 82.08 668.6352
+L 781.92 668.6352
+Q 789.696 668.6352 789.696 660.9888
+L 789.696 610.0128
+Q 789.696 602.3664 781.92 602.3664
+L 82.08 602.3664
+Q 74.304 602.3664 74.304 610.0128
+L 74.304 660.9888
+Q 74.304 668.6352 82.08 668.6352
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 235.008 570.5064
+L 430.619458 601.299476
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 426.251061 598.182249
+L 430.619458 601.299476
+L 425.504639 602.923858
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 652.32 570.5064
+L 433.383901 601.322014
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 438.471557 603.029574
+L 433.383901 601.322014
+L 437.802543 598.276426
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_22">
+    <path d="M 82.08 765.0648
+L 781.92 765.0648
+Q 789.696 765.0648 789.696 757.4184
+L 789.696 702.1944
+Q 789.696 694.548 781.92 694.548
+L 82.08 694.548
+Q 74.304 694.548 74.304 702.1944
+L 74.304 757.4184
+Q 74.304 765.0648 82.08 765.0648
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #def5e9; stroke: #52a582; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_23">
+    <path d="M 432 668.6352
+L 432 692.300858
+" clip-path="url(#p87e9900d7f)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 434.4 687.500858
+L 432 692.300858
+L 429.6 687.500858
+z
+" clip-path="url(#p87e9900d7f)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 23px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #16304b" x="38.88" y="36.082562" transform="rotate(-0 38.88 36.082562)">Demo · test CIFAR-10 và xuất báo cáo PDF</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #16304b" x="38.88" y="64.157928" transform="rotate(-0 38.88 64.157928)">Chốt model bằng validation trước · nạp một checkpoint · test một lượt · xuất cùng bộ artifact</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="118.5464" transform="rotate(-0 235.008 118.5464)">Nhánh checkpoint đã chọn</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="118.5464" transform="rotate(-0 652.32 118.5464)">Nhánh dữ liệu official test</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="171.289877" transform="rotate(-0 235.008 171.289877)">Global best từ validation</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="193.369014" transform="rotate(-0 235.008 193.369014)">checkpoints/checkpoint_best_global.pt</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="256.202221" transform="rotate(-0 235.008 256.202221)">Đọc metadata → dựng CNN</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="278.329014" transform="rotate(-0 235.008 278.329014)">Architecture / mode / classes / transform_spec</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="341.209878" transform="rotate(-0 235.008 341.209878)">Load strict → model.eval()</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="363.706147" transform="rotate(-0 235.008 363.706147)">pretrained=False · đủ backbone + head</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="171.289877" transform="rotate(-0 652.32 171.289877)">CIFAR10(train=False)</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="193.517811" transform="rotate(-0 652.32 193.517811)">10.000 ảnh RGB 32×32 · class order chuẩn</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="256.493878" transform="rotate(-0 652.32 256.493878)">Eval transform từ checkpoint</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="278.477811" transform="rotate(-0 652.32 278.477811)">Resize 256 → CenterCrop 224 → Normalize</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="341.209878" transform="rotate(-0 652.32 341.209878)">DataLoader · shuffle=False</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="363.289014" transform="rotate(-0 652.32 363.289014)">[B,3,224,224] · drop_last=False</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="437.273622" transform="rotate(-0 432 437.273622)">inference_mode() · một lượt qua 10.000 ảnh</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="462.057017" transform="rotate(-0 432 462.057017)">Logits → loss / probabilities / predictions · không cập nhật trọng số</text>
+   </g>
+   <g id="text_19">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="533.025628" transform="rotate(-0 235.008 533.025628)">JSON + CSV của cùng lần test</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="554.449014" transform="rotate(-0 235.008 554.449014)">sample_index · true/pred · prob_0 … prob_9</text>
+   </g>
+   <g id="text_21">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="532.83119" transform="rotate(-0 652.32 532.83119)">Confusion matrix · ROC · ảnh đúng/sai</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="555.054233" transform="rotate(-0 652.32 555.054233)">Dùng cùng labels / probabilities và ảnh RGB gốc</text>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="627.868745" transform="rotate(-0 432 627.868745)">Đối chiếu metrics, CSV và hình</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="651.751171" transform="rotate(-0 432 651.751171)">10.000 hàng · support/CM = 10.000 · đúng class order / checkpoint hash</text>
+   </g>
+   <g id="text_25">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="720.896381" transform="rotate(-0 432 720.896381)">PredictPDF.py → reports/Predict_Report.pdf</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="747.233753" transform="rotate(-0 432 747.233753)">Báo cáo tiếng Việt từ cùng JSON / CSV / PNG · dựng lại được không inference lại</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="803.764013" transform="rotate(-0 432 803.764013)">PDF/ảnh/CSV phản ánh official test; HTML training giữ kết quả train/validation riêng.</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="828.464334" transform="rotate(-0 432 828.464334)">Không chọn lại model, checkpoint hoặc hyperparameters bằng kết quả test.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p87e9900d7f">
+   <rect x="0" y="0" width="864" height="849.6"/>
+  </clipPath>
+ </defs>
+</svg>

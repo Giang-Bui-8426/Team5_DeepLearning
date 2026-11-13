@@ -13,10 +13,9 @@ Repository lưu trữ source code, tài liệu và kết quả thực nghiệm c
 
 ```text
 Deep-Learning/
-├── .gitignore
 ├── .gitattributes
-├── README.md
-├── requirements.txt           # Danh sách thư viện (khi được bổ sung)
+├── READMI.md
+├── requirements.txt           # Thư viện dùng cho LAB2
 ├── LAB1/
 │   ├── EDA.py                 # Phân tích dữ liệu
 │   ├── ModelMLP.py            # Định nghĩa kiến trúc MLP
@@ -28,10 +27,54 @@ Deep-Learning/
 │   ├── reports/               # EDA HTML, HTML tổng hợp, biểu đồ, CSV, JSON, PDF test
 │   │   └── test/              # Metrics, dự đoán và hình đánh giá trên tập test
 │   └── docs/                  # Tài liệu Markdown và hình minh họa
-└── LAB2/                      # Source, tài liệu và kết quả của LAB2
+└── LAB2/
+    ├── EDA.py                 # Phân tích dữ liệu
+    ├── model.py               # CNN pretrained, head và freeze policy
+    ├── data.py                # Dataset, split và preprocessing dùng chung
+    ├── metrics.py             # Metrics và đọc/ghi artifact dùng chung
+    ├── train.py               # Sáu run, checkpoint/resume và TensorBoard
+    ├── TrainReport.py         # History và một báo cáo HTML tổng hợp
+    ├── Predict.py             # Test checkpoint đã chọn, xuất JSON/CSV/PNG
+    ├── PredictPDF.py          # Dựng PDF từ bộ kết quả đã lưu
+    ├── Evaluate.py            # Đối chiếu checkpoint/validation, xuất CSV và hình đánh giá
+    ├── tests.py               # Kiểm tra chức năng và tái lập resume
+    ├── Docs/                  # Đặc tả và hình minh họa
+    ├── data/                  # CIFAR-10 và splits.npz
+    ├── checkpoints/           # Sinh khi train: best/last theo run, global best
+    ├── logs/                  # Sinh khi train: TensorBoard theo run
+    ├── reports/               # EDA, history, CSV, HTML và PDF
+    │   └── test/              # Sinh khi test: metrics, dự đoán và hình
+    ├── smoke/                 # Output kiểm tra chức năng, tách khỏi thực nghiệm
+    └── archives/              # Giữ output lượt bị ngắt khi thay đổi cấu hình
 ```
 
-Các thư mục `data/`, `logs/`, checkpoint `last_checkpoint.pt` và báo cáo HTML riêng từng mô hình được loại khỏi Git theo [`.gitignore`](.gitignore). Chỉ những file đã tạo và commit mới xuất hiện trên GitHub.
+Trong LAB2, dữ liệu, logs, smoke và last checkpoint được loại khỏi Git theo [LAB2/.gitignore](LAB2/.gitignore). Chỉ những file đã tạo và commit mới xuất hiện trên GitHub.
+
+## Chạy LAB2
+
+Đặc tả tại [LAB2/Docs](LAB2/Docs/lab-description.md), thư viện tại [requirements.txt](requirements.txt). Dữ liệu cần có ở `LAB2/data/prepared`, split và output EDA theo [data.md](LAB2/Docs/data.md).
+
+Chạy từ gốc repository:
+
+```powershell
+python LAB2/tests.py
+python LAB2/train.py --run all --device auto
+python LAB2/Predict.py --device auto
+python LAB2/Evaluate.py --device auto
+```
+
+Training nạp weights ImageNet; torchvision tải weights nếu cache chưa có. `train.py --smoke` dùng khởi tạo ngẫu nhiên, ít ảnh train/validation và output riêng để kiểm tra chức năng. Test chính thức chỉ chạy sau khi đủ sáu run hợp lệ và có `reports/selection.json`.
+
+Kết quả LAB2 đã chạy: [phân tích thực nghiệm](LAB2/Docs/evaluation.md) · [HTML training](LAB2/reports/report_all_models.html) · [PDF test](LAB2/reports/Predict_Report.pdf). Trạng thái và bằng chứng nghiệm thu tại [plan-progress](LAB2/Docs/plan-progress).
+
+Dựng lại báo cáo từ artifact đã lưu:
+
+```powershell
+python LAB2/TrainReport.py LAB2/reports
+python LAB2/PredictPDF.py --report-dir LAB2/reports/test --out LAB2/reports/Predict_Report_rebuilt.pdf
+```
+
+Khi dùng `--output-root` khác, truyền đường dẫn checkpoint/output tương ứng cho bước test và báo cáo. Run đã có output dùng `--resume` với cùng cấu hình hoặc chọn root mới.
 
 ## Tài liệu và báo cáo LAB1
 

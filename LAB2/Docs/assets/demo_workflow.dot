@@ -1,0 +1,26 @@
+digraph demo_workflow {
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans"];
+  model0 [label="Global best từ validation\ncheckpoints/checkpoint_best_global.pt", fillcolor="#E6F0FF"];
+  model1 [label="Đọc metadata → dựng CNN\nArchitecture / mode / classes / transform_spec", fillcolor="#FFFFFF"];
+  model2 [label="Load strict → model.eval()\npretrained=False · đủ backbone + head", fillcolor="#FFFFFF"];
+  data0 [label="CIFAR10(train=False)\n10.000 ảnh RGB 32×32 · class order chuẩn", fillcolor="#E6F0FF"];
+  data1 [label="Eval transform từ checkpoint\nResize 256 → CenterCrop 224 → Normalize", fillcolor="#FFFFFF"];
+  data2 [label="DataLoader · shuffle=False\n[B,3,224,224] · drop_last=False", fillcolor="#FFFFFF"];
+  infer [label="inference_mode() · một lượt qua 10.000 ảnh\nLogits → loss / probabilities / predictions · không cập nhật trọng số", fillcolor="#DEF5E9"];
+  records [label="JSON + CSV của cùng lần test\nsample_index · true/pred · prob_0 … prob_9", fillcolor="#E6F0FF"];
+  figures [label="Confusion matrix · ROC · ảnh đúng/sai\nDùng cùng labels / probabilities và ảnh RGB gốc", fillcolor="#E6F0FF"];
+  check [label="Đối chiếu metrics, CSV và hình\n10.000 hàng · support/CM = 10.000 · đúng class order / checkpoint hash", fillcolor="#FFFFFF"];
+  pdf [label="PredictPDF.py → reports/Predict_Report.pdf\nBáo cáo tiếng Việt từ cùng JSON / CSV / PNG · dựng lại được không inference lại", fillcolor="#DEF5E9"];
+  model0 -> model1;
+  model1 -> model2;
+  data0 -> data1;
+  data1 -> data2;
+  model2 -> infer;
+  data2 -> infer;
+  infer -> records;
+  infer -> figures;
+  records -> check;
+  figures -> check;
+  check -> pdf;
+}
