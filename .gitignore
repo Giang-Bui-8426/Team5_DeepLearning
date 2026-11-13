@@ -1,0 +1,64 @@
+# Deep Learning 
+
+# Python: cache, build, test
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+coverage.xml
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Python environments / local secrets
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Jupyter temporary files
+.ipynb_checkpoints/
+
+# Editor / operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# Downloaded datasets and TensorBoard event logs (LAB1 & LAB2)
+**/data/
+**/logs/
+**/runs/
+events.out.tfevents.*
+
+# Model-specific HTML reports: keep only the aggregate training HTML
+# (and unrelated HTML such as an EDA report, if present).
+**/reports/*/report.html
+
+# Checkpoints: ignore all contents except each model's best
+# and the global best used by Predict.py.
+**/checkpoints/**/*
+!**/checkpoints/**/
+!**/checkpoints/**/checkpoint_best.pt
+!**/checkpoints/**/checkpoint_best_global.pt
+
+# General temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.orig
+*.part
+*.crdownload
