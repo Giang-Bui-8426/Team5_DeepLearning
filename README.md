@@ -8,6 +8,7 @@ Repository lưu trữ source code, tài liệu và kết quả thực nghiệm c
 |---|---|---|
 | **LAB1 — MLP** | Phân loại Fashion-MNIST, huấn luyện và so sánh 6 cấu hình MLP | [LAB1](LAB1/docs/lab-description.md) |
 | **LAB2 — Transfer Learning** | Feature extraction và fine-tuning các mô hình CNN pretrained | [LAB2](LAB2/) |
+| **LAB3 — Hugging Face** | Suy luận và fine-tuning mô hình pretrained cho phân tích cảm xúc | [LAB3](LAB3/) |
 
 ## Cấu trúc repository
 
@@ -40,6 +41,25 @@ Deep-Learning/
     ├── tests.py               # Kiểm tra chức năng và tái lập resume
     ├── Docs/                  # Đặc tả và hình minh họa
     ├── data/                  # CIFAR-10 và splits.npz
+    ├── checkpoints/           # Sinh khi train: best/last theo run, global best
+    ├── logs/                  # Sinh khi train: TensorBoard theo run
+    ├── reports/               # EDA, history, CSV, HTML và PDF
+    │   └── test/              # Sinh khi test: metrics, dự đoán và hình
+    ├── smoke/                 # Output kiểm tra chức năng, tách khỏi thực nghiệm
+    └── archives/              # Giữ output lượt bị ngắt khi thay đổi cấu hình
+└── LAB3/
+    ├── EDA.py                 # Phân tích dữ liệu IMDB
+    ├── model.py               # DistilBERT backbone và classification head
+    ├── data.py                # Dataset IMDB, split và preprocessing dùng chung
+    ├── metrics.py             # Metrics và đọc/ghi artifact dùng chung
+    ├── train.py               # Fine-tuning, checkpoint/resume và TensorBoard
+    ├── TrainReport.py         # History và một báo cáo HTML tổng hợp
+    ├── Predict.py             # Test checkpoint đã chọn, xuất JSON/CSV/HTML
+    ├── PredictPDF.py          # (Tuỳ chọn) Dựng PDF từ bộ kết quả đã lưu
+    ├── Evaluate.py            # Đối chiếu checkpoint/validation, xuất CSV và hình đánh giá
+    ├── tests.py               # Kiểm tra chức năng và tái lập resume
+    ├── Docs/                  # Đặc tả và hình minh họa
+    ├── data/                  # IMDB và splits
     ├── checkpoints/           # Sinh khi train: best/last theo run, global best
     ├── logs/                  # Sinh khi train: TensorBoard theo run
     ├── reports/               # EDA, history, CSV, HTML và PDF
@@ -86,3 +106,14 @@ Khi dùng `--output-root` khác, truyền đường dẫn checkpoint/output tư�
 | Đánh giá và so sánh 6 mô hình | [evaluation.md](LAB1/docs/evaluation.md) · [report_all_models.html](LAB1/reports/report_all_models.html) |
 | Demo và kết quả test | [demo.md](LAB1/docs/demo.md) · [Predict_Report.pdf](LAB1/reports/Predict_Report.pdf) |
 | Tiến độ thực hiện | [plan-progression.md](LAB1/docs/plan-progression.md) |
+
+## Tài liệu và báo cáo LAB3
+
+| Nội dung | Liên kết |
+|---|---|
+| Tổng quan LAB3 | [lab-description.md](LAB3/docs/lab-description.md) |
+| Dữ liệu và EDA | [data.md](LAB3/docs/data.md) |
+| Kiến trúc và huấn luyện | [model.md](LAB3/docs/model.md) · [trainning.md](LAB3/docs/trainning.md) |
+| Đánh giá và so sánh hai bài tập | [evaluation.md](LAB3/docs/evaluation.md) |
+| Demo và kết quả test | [demo.md](LAB3/docs/demo.md) |
+| Tiến độ thực hiện | [plan-progression.md](LAB3/docs/plan-progression.md) |

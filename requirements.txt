@@ -7,3 +7,6 @@ Pillow==11.3.0
 tensorboard==2.20.0
 psutil==6.1.0
 reportlab==5.1.0
+transformers==4.46.0
+datasets==2.20.0
+evaluate==0.4.3
