@@ -1,0 +1,81 @@
+CNN(
+  (network): VGG(
+    (features): Sequential(
+      (0): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace=True)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (3): ReLU(inplace=True)
+      (4): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      (5): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (6): ReLU(inplace=True)
+      (7): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (8): ReLU(inplace=True)
+      (9): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      (10): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (11): ReLU(inplace=True)
+      (12): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (13): ReLU(inplace=True)
+      (14): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (15): ReLU(inplace=True)
+      (16): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      (17): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (18): ReLU(inplace=True)
+      (19): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (20): ReLU(inplace=True)
+      (21): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (22): ReLU(inplace=True)
+      (23): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      (24): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (25): ReLU(inplace=True)
+      (26): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (27): ReLU(inplace=True)
+      (28): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (29): ReLU(inplace=True)
+      (30): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    )
+    (avgpool): AdaptiveAvgPool2d(output_size=(7, 7))
+    (classifier): Sequential(
+      (0): Linear(in_features=25088, out_features=4096, bias=True)
+      (1): ReLU(inplace=True)
+      (2): Dropout(p=0.5, inplace=False)
+      (3): Linear(in_features=4096, out_features=4096, bias=True)
+      (4): ReLU(inplace=True)
+      (5): Dropout(p=0.5, inplace=False)
+      (6): Linear(in_features=4096, out_features=10, bias=True)
+    )
+  )
+)
+{'n_params': 134301514, 'trainable_params': 40970}
+Parameter | Shape | Count | Trainable
+network.features.0.weight | (64, 3, 3, 3) | 1728 | False
+network.features.0.bias | (64,) | 64 | False
+network.features.2.weight | (64, 64, 3, 3) | 36864 | False
+network.features.2.bias | (64,) | 64 | False
+network.features.5.weight | (128, 64, 3, 3) | 73728 | False
+network.features.5.bias | (128,) | 128 | False
+network.features.7.weight | (128, 128, 3, 3) | 147456 | False
+network.features.7.bias | (128,) | 128 | False
+network.features.10.weight | (256, 128, 3, 3) | 294912 | False
+network.features.10.bias | (256,) | 256 | False
+network.features.12.weight | (256, 256, 3, 3) | 589824 | False
+network.features.12.bias | (256,) | 256 | False
+network.features.14.weight | (256, 256, 3, 3) | 589824 | False
+network.features.14.bias | (256,) | 256 | False
+network.features.17.weight | (512, 256, 3, 3) | 1179648 | False
+network.features.17.bias | (512,) | 512 | False
+network.features.19.weight | (512, 512, 3, 3) | 2359296 | False
+network.features.19.bias | (512,) | 512 | False
+network.features.21.weight | (512, 512, 3, 3) | 2359296 | False
+network.features.21.bias | (512,) | 512 | False
+network.features.24.weight | (512, 512, 3, 3) | 2359296 | False
+network.features.24.bias | (512,) | 512 | False
+network.features.26.weight | (512, 512, 3, 3) | 2359296 | False
+network.features.26.bias | (512,) | 512 | False
+network.features.28.weight | (512, 512, 3, 3) | 2359296 | False
+network.features.28.bias | (512,) | 512 | False
+network.classifier.0.weight | (4096, 25088) | 102760448 | False
+network.classifier.0.bias | (4096,) | 4096 | False
+network.classifier.3.weight | (4096, 4096) | 16777216 | False
+network.classifier.3.bias | (4096,) | 4096 | False
+network.classifier.6.weight | (10, 4096) | 40960 | True
+network.classifier.6.bias | (10,) | 10 | True

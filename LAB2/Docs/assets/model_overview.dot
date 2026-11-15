@@ -1,0 +1,29 @@
+digraph model_overview {
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans"];
+  input [label="CIFAR-10 RGB · [B,3,32,32]\nResize 256 → CenterCrop 224 → Normalize ImageNet · [B,3,224,224]", fillcolor="#E6F0FF"];
+  r0 [label="ResNet18 · backbone\nStem + layer1–4\n[B,512,7,7]", fillcolor="#EDF2F7"];
+  r1 [label="Global average pooling\nFlatten → [B,512]", fillcolor="#FFFFFF"];
+  r2 [label="fc mới\nLinear 512 → 10", fillcolor="#DEF5E9"];
+  r3 [label="Logits [B,10]\nChưa qua Softmax", fillcolor="#E6F0FF"];
+  v0 [label="VGG16 · features\n5 block Conv/ReLU/MaxPool\n[B,512,7,7]", fillcolor="#EDF2F7"];
+  v1 [label="AvgPool → Flatten → FC1 → FC2\n25088 → 4096 → 4096\nGiữ classifier[0:6] pretrained", fillcolor="#EDF2F7"];
+  v2 [label="classifier[6] mới\nLinear 4096 → 10", fillcolor="#DEF5E9"];
+  v3 [label="Logits [B,10]\nChưa qua Softmax", fillcolor="#E6F0FF"];
+  d0 [label="DenseNet121 · features\n4 dense blocks + 3 transitions\n[B,1024,7,7]", fillcolor="#EDF2F7"];
+  d1 [label="ReLU → GAP → Flatten\nVector [B,1024]", fillcolor="#FFFFFF"];
+  d2 [label="classifier mới\nLinear 1024 → 10", fillcolor="#DEF5E9"];
+  d3 [label="Logits [B,10]\nChưa qua Softmax", fillcolor="#E6F0FF"];
+  r0 -> r1;
+  r1 -> r2;
+  r2 -> r3;
+  input -> r0;
+  v0 -> v1;
+  v1 -> v2;
+  v2 -> v3;
+  input -> v0;
+  d0 -> d1;
+  d1 -> d2;
+  d2 -> d3;
+  input -> d0;
+}

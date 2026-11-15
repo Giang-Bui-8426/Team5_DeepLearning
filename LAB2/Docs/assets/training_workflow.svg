@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="864pt" height="921.6pt" viewBox="0 0 864 921.6" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.0, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 921.6
+L 864 921.6
+L 864 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 47.088 217.4976
+L 422.928 217.4976
+Q 430.704 217.4976 430.704 209.2032
+L 430.704 166.8096
+Q 430.704 158.5152 422.928 158.5152
+L 47.088 158.5152
+Q 39.312 158.5152 39.312 166.8096
+L 39.312 209.2032
+Q 39.312 217.4976 47.088 217.4976
+z
+" clip-path="url(#p6b9d289075)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 47.088 292.4928
+L 422.928 292.4928
+Q 430.704 292.4928 430.704 284.1984
+L 430.704 241.8048
+Q 430.704 233.5104 422.928 233.5104
+L 47.088 233.5104
+Q 39.312 233.5104 39.312 241.8048
+L 39.312 284.1984
+Q 39.312 292.4928 47.088 292.4928
+z
+" clip-path="url(#p6b9d289075)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 235.008 217.4976
+L 235.008 231.191258
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 226.391258
+L 235.008 231.191258
+L 232.608 226.391258
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 47.088 367.488
+L 422.928 367.488
+Q 430.704 367.488 430.704 359.1936
+L 430.704 316.8
+Q 430.704 308.5056 422.928 308.5056
+L 47.088 308.5056
+Q 39.312 308.5056 39.312 316.8
+L 39.312 359.1936
+Q 39.312 367.488 47.088 367.488
+z
+" clip-path="url(#p6b9d289075)" style="fill: #def5e9; stroke: #52a582; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 235.008 292.4928
+L 235.008 306.186458
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 301.386458
+L 235.008 306.186458
+L 232.608 301.386458
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 47.088 442.4832
+L 422.928 442.4832
+Q 430.704 442.4832 430.704 434.1888
+L 430.704 391.7952
+Q 430.704 383.5008 422.928 383.5008
+L 47.088 383.5008
+Q 39.312 383.5008 39.312 391.7952
+L 39.312 434.1888
+Q 39.312 442.4832 47.088 442.4832
+z
+" clip-path="url(#p6b9d289075)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 235.008 367.488
+L 235.008 381.181658
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 376.381658
+L 235.008 381.181658
+L 232.608 376.381658
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 47.088 517.4784
+L 422.928 517.4784
+Q 430.704 517.4784 430.704 509.184
+L 430.704 466.7904
+Q 430.704 458.496 422.928 458.496
+L 47.088 458.496
+Q 39.312 458.496 39.312 466.7904
+L 39.312 509.184
+Q 39.312 517.4784 47.088 517.4784
+z
+" clip-path="url(#p6b9d289075)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 235.008 442.4832
+L 235.008 456.176858
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 451.376858
+L 235.008 456.176858
+L 232.608 451.376858
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 47.088 592.4736
+L 422.928 592.4736
+Q 430.704 592.4736 430.704 584.1792
+L 430.704 541.7856
+Q 430.704 533.4912 422.928 533.4912
+L 47.088 533.4912
+Q 39.312 533.4912 39.312 541.7856
+L 39.312 584.1792
+Q 39.312 592.4736 47.088 592.4736
+z
+" clip-path="url(#p6b9d289075)" style="fill: #fff0cd; stroke: #d8a245; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 235.008 517.4784
+L 235.008 531.172058
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 526.372058
+L 235.008 531.172058
+L 232.608 526.372058
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 47.088 667.4688
+L 422.928 667.4688
+Q 430.704 667.4688 430.704 659.1744
+L 430.704 616.7808
+Q 430.704 608.4864 422.928 608.4864
+L 47.088 608.4864
+Q 39.312 608.4864 39.312 616.7808
+L 39.312 659.1744
+Q 39.312 667.4688 47.088 667.4688
+z
+" clip-path="url(#p6b9d289075)" style="fill: #fff0cd; stroke: #d8a245; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 235.008 592.4736
+L 235.008 606.167258
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 601.367258
+L 235.008 606.167258
+L 232.608 601.367258
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 47.088 742.464
+L 422.928 742.464
+Q 430.704 742.464 430.704 734.1696
+L 430.704 691.776
+Q 430.704 683.4816 422.928 683.4816
+L 47.088 683.4816
+Q 39.312 683.4816 39.312 691.776
+L 39.312 734.1696
+Q 39.312 742.464 47.088 742.464
+z
+" clip-path="url(#p6b9d289075)" style="fill: #def5e9; stroke: #52a582; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 235.008 667.4688
+L 235.008 681.162458
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 676.362458
+L 235.008 681.162458
+L 232.608 676.362458
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 47.088 817.4592
+L 422.928 817.4592
+Q 430.704 817.4592 430.704 809.1648
+L 430.704 766.7712
+Q 430.704 758.4768 422.928 758.4768
+L 47.088 758.4768
+Q 39.312 758.4768 39.312 766.7712
+L 39.312 809.1648
+Q 39.312 817.4592 47.088 817.4592
+z
+" clip-path="url(#p6b9d289075)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 235.008 742.464
+L 235.008 756.157658
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 237.408 751.357658
+L 235.008 756.157658
+L 232.608 751.357658
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 498.96 244.224
+L 805.68 244.224
+Q 813.456 244.224 813.456 235.9296
+L 813.456 184.32
+Q 813.456 176.0256 805.68 176.0256
+L 498.96 176.0256
+Q 491.184 176.0256 491.184 184.32
+L 491.184 235.9296
+Q 491.184 244.224 498.96 244.224
+z
+" clip-path="url(#p6b9d289075)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 498.96 336.384
+L 805.68 336.384
+Q 813.456 336.384 813.456 328.0896
+L 813.456 276.48
+Q 813.456 268.1856 805.68 268.1856
+L 498.96 268.1856
+Q 491.184 268.1856 491.184 276.48
+L 491.184 328.0896
+Q 491.184 336.384 498.96 336.384
+z
+" clip-path="url(#p6b9d289075)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 652.32 244.224
+L 652.32 265.866458
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 654.72 261.066458
+L 652.32 265.866458
+L 649.92 261.066458
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_22">
+    <path d="M 498.96 428.544
+L 805.68 428.544
+Q 813.456 428.544 813.456 420.2496
+L 813.456 368.64
+Q 813.456 360.3456 805.68 360.3456
+L 498.96 360.3456
+Q 491.184 360.3456 491.184 368.64
+L 491.184 420.2496
+Q 491.184 428.544 498.96 428.544
+z
+" clip-path="url(#p6b9d289075)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_23">
+    <path d="M 652.32 336.384
+L 652.32 358.026458
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 654.72 353.226458
+L 652.32 358.026458
+L 649.92 353.226458
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_24">
+    <path d="M 498.96 520.704
+L 805.68 520.704
+Q 813.456 520.704 813.456 512.4096
+L 813.456 460.8
+Q 813.456 452.5056 805.68 452.5056
+L 498.96 452.5056
+Q 491.184 452.5056 491.184 460.8
+L 491.184 512.4096
+Q 491.184 520.704 498.96 520.704
+z
+" clip-path="url(#p6b9d289075)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_25">
+    <path d="M 652.32 428.544
+L 652.32 450.186458
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 654.72 445.386458
+L 652.32 450.186458
+L 649.92 445.386458
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_26">
+    <path d="M 498.96 612.864
+L 805.68 612.864
+Q 813.456 612.864 813.456 604.5696
+L 813.456 552.96
+Q 813.456 544.6656 805.68 544.6656
+L 498.96 544.6656
+Q 491.184 544.6656 491.184 552.96
+L 491.184 604.5696
+Q 491.184 612.864 498.96 612.864
+z
+" clip-path="url(#p6b9d289075)" style="fill: #ffffff; stroke: #b4c7dd; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_27">
+    <path d="M 652.32 520.704
+L 652.32 542.346458
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 654.72 537.546458
+L 652.32 542.346458
+L 649.92 537.546458
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_28">
+    <path d="M 498.96 705.024
+L 805.68 705.024
+Q 813.456 705.024 813.456 696.7296
+L 813.456 645.12
+Q 813.456 636.8256 805.68 636.8256
+L 498.96 636.8256
+Q 491.184 636.8256 491.184 645.12
+L 491.184 696.7296
+Q 491.184 705.024 498.96 705.024
+z
+" clip-path="url(#p6b9d289075)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_29">
+    <path d="M 652.32 612.864
+L 652.32 634.506458
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 654.72 629.706458
+L 652.32 634.506458
+L 649.92 629.706458
+z
+" clip-path="url(#p6b9d289075)" style="fill: #71839a; stroke: #71839a; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_30">
+    <path d="M 812.592 670.9248
+L 839.808 670.9248
+L 839.808 210.1248
+L 816.581542 210.1248
+" clip-path="url(#p6b9d289075)" style="fill: none; stroke-dasharray: 4.625,2; stroke-dashoffset: 0; stroke: #3f80bc; stroke-width: 1.25; stroke-linecap: round"/>
+    <path d="M 821.381542 212.5248
+L 816.581542 210.1248
+L 821.381542 207.7248
+z
+" clip-path="url(#p6b9d289075)" style="fill: #3f80bc; stroke-dasharray: 4.625,2; stroke-dashoffset: 0; stroke: #3f80bc; stroke-width: 1.25; stroke-linecap: round"/>
+   </g>
+   <g id="patch_31">
+    <path d="M 492.48 835.4304
+L 812.16 835.4304
+Q 819.936 835.4304 819.936 827.136
+L 819.936 748.8
+Q 819.936 740.5056 812.16 740.5056
+L 492.48 740.5056
+Q 484.704 740.5056 484.704 748.8
+L 484.704 827.136
+Q 484.704 835.4304 492.48 835.4304
+z
+" clip-path="url(#p6b9d289075)" style="fill: #e6f0ff; stroke: #7fa7da; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 23px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #16304b" x="38.88" y="39.838813" transform="rotate(-0 38.88 39.838813)">Luồng huấn luyện · train head → fine-tune tiếp</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #16304b" x="38.88" y="69.290592" transform="rotate(-0 38.88 69.290592)">CIFAR-10 · 45.000 train / 5.000 validation · mỗi kiến trúc có hai giai đoạn nối tiếp</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="129.7785" transform="rotate(-0 235.008 129.7785)">Chuỗi cho từng kiến trúc</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="181.641357" transform="rotate(-0 235.008 181.641357)">Đọc Config_parameter, split và seed</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="202.527043" transform="rotate(-0 235.008 202.527043)">Dùng cùng dữ liệu / preprocessing</text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="256.758557" transform="rotate(-0 235.008 256.758557)">ImageNet → head 10 lớp</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="277.522243" transform="rotate(-0 235.008 277.522243)">Đóng băng backbone</text>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="331.530726" transform="rotate(-0 235.008 331.530726)">Giai đoạn 1 · train head</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="352.571779" transform="rotate(-0 235.008 352.571779)">Chỉ head nhận cập nhật</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="406.525926" transform="rotate(-0 235.008 406.525926)">Validation → chọn best FE</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="427.566979" transform="rotate(-0 235.008 427.566979)">Lưu checkpoint của run 01 / 03 / 05</text>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="481.765126" transform="rotate(-0 235.008 481.765126)">Load toàn bộ best checkpoint FE</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="502.293843" transform="rotate(-0 235.008 502.293843)">Giữ backbone + head đã học</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="557.198763" transform="rotate(-0 235.008 557.198763)">Mở stage cuối + tạo optimizer mới</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="577.289043" transform="rotate(-0 235.008 577.289043)">LR head / backbone theo cấu hình</text>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="632.214932" transform="rotate(-0 235.008 632.214932)">Giai đoạn 2 · fine-tune tiếp</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="652.740665" transform="rotate(-0 235.008 652.740665)">Head + stage cuối nhận cập nhật</text>
+   </g>
+   <g id="text_18">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="706.533414" transform="rotate(-0 235.008 706.533414)">Validation → lưu best fine-tune</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="727.493443" transform="rotate(-0 235.008 727.493443)">Checkpoint riêng run 02 / 04 / 06</text>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="781.745926" transform="rotate(-0 235.008 781.745926)">So sánh 6 run → CSV + một HTML offline</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="235.008" y="802.125846" transform="rotate(-0 235.008 802.125846)">reports/report_all_models.html</text>
+   </g>
+   <g id="text_22">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="129.0885" transform="rotate(-0 652.32 129.0885)">Vòng lặp epoch dùng chung</text>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="201.934373" transform="rotate(-0 652.32 201.934373)">model.train()</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="226.672963" transform="rotate(-0 652.32 226.672963)">Duy trì policy BatchNorm / Dropout</text>
+   </g>
+   <g id="text_25">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="294.046717" transform="rotate(-0 652.32 294.046717)">Forward → CrossEntropyLoss</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="318.926588" transform="rotate(-0 652.32 318.926588)">zero_grad → autocast nếu CUDA</text>
+   </g>
+   <g id="text_27">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="386.254373" transform="rotate(-0 652.32 386.254373)">Backward → clip → optimizer step</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="410.992963" transform="rotate(-0 652.32 410.992963)">AMP: unscale trước clipping</text>
+   </g>
+   <g id="text_29">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="478.45917" transform="rotate(-0 652.32 478.45917)">model.eval() → validation 5.000 ảnh</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="503.004166" transform="rotate(-0 652.32 503.004166)">inference_mode · không augmentation</text>
+   </g>
+   <g id="text_31">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="570.770717" transform="rotate(-0 652.32 570.770717)">Ghi metrics, thời gian, bộ nhớ</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="595.098963" transform="rotate(-0 652.32 595.098963)">TensorBoard + history theo epoch</text>
+   </g>
+   <g id="text_33">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="662.930717" transform="rotate(-0 652.32 662.930717)">Scheduler → lưu best / last → xét dừng</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="687.895112" transform="rotate(-0 652.32 687.895112)">Epoch cuối vẫn được lưu đầy đủ</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 10.3px; font-family: 'DejaVu Sans'; fill: #2f679b" transform="translate(824.081516 496.324352) rotate(-90)">Chưa dừng: epoch tiếp</text>
+   </g>
+   <g id="text_36">
+    <text style="font-weight: 700; font-size: 12.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="652.32" y="774.773901" transform="rotate(-0 652.32 774.773901)">Resume cùng run từ last_checkpoint.pt</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; fill: #16304b" transform="translate(528.582859 803.292509)">Khôi phục model + optimizer/scheduler/scaler</text>
+    <text style="font-size: 10.7px; font-family: 'DejaVu Sans'; fill: #16304b" transform="translate(550.169273 817.499434)">+ epoch, RNG và trạng thái dừng sớm</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="869.808531" transform="rotate(-0 432 869.808531)">Fine-tune là giai đoạn tiếp theo từ best FE; resume là tiếp tục một giai đoạn đang dở.</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 10.6px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #16304b" x="432" y="895.644894" transform="rotate(-0 432 895.644894)">Official test chỉ dùng ở bước demo sau khi chốt mô hình bằng validation.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p6b9d289075">
+   <rect x="0" y="0" width="864" height="921.6"/>
+  </clipPath>
+ </defs>
+</svg>

@@ -1,0 +1,33 @@
+digraph model_resnet18_flow {
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans"];
+  r0 [label="Input đã preprocessing\n[B,3,224,224]", fillcolor="#E6F0FF"];
+  r1 [label="Stem · Conv 7×7 / s2 → BN → ReLU\n[B,64,112,112]", fillcolor="#EDF2F7"];
+  r2 [label="MaxPool 3×3 / s2\n[B,64,56,56]", fillcolor="#FFFFFF"];
+  r3 [label="layer1 · 2 BasicBlock\n64 kênh · [B,64,56,56]", fillcolor="#EDF2F7"];
+  r4 [label="layer2 · 2 BasicBlock\n128 kênh · [B,128,28,28]", fillcolor="#EDF2F7"];
+  r5 [label="layer3 · 2 BasicBlock\n256 kênh · [B,256,14,14]", fillcolor="#EDF2F7"];
+  r6 [label="layer4 · 2 BasicBlock\n512 kênh · [B,512,7,7]", fillcolor="#FFF0CD"];
+  r7 [label="AdaptiveAvgPool2d(1)\n[B,512,1,1]", fillcolor="#FFFFFF"];
+  r8 [label="Flatten từ chiều 1\n[B,512]", fillcolor="#FFFFFF"];
+  r9 [label="fc mới · Linear 512 → 10\nLogits [B,10] · không Softmax", fillcolor="#DEF5E9"];
+  bi [label="Input x\n[B,Cin,H,W]", fillcolor="#E6F0FF"];
+  bc1 [label="Conv 3×3 → BN → ReLU\nstride s · Cout kênh", fillcolor="#FFFFFF"];
+  bc2 [label="Conv 3×3 → BN\nstride 1 · Cout kênh", fillcolor="#FFFFFF"];
+  badd [label="Cộng theo phần tử\nF(x) + S(x)", fillcolor="#E6F0FF"];
+  bout [label="ReLU → output\n[B,Cout,Hout,Wout]", fillcolor="#FFFFFF"];
+  r0 -> r1;
+  r1 -> r2;
+  r2 -> r3;
+  r3 -> r4;
+  r4 -> r5;
+  r5 -> r6;
+  r6 -> r7;
+  r7 -> r8;
+  r8 -> r9;
+  bi -> bc1;
+  bc1 -> bc2;
+  bc2 -> badd;
+  badd -> bout;
+  bi -> badd [style=dashed];
+}
