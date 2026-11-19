@@ -1,0 +1,1004 @@
+{
+  "dataset": "UCI Appliances Energy Prediction",
+  "purpose": "Coursework Topic 8 EDA",
+  "generated_at": "2026-11-19T11:51:14",
+  "elapsed_seconds": 1.97,
+  "target": "Appliances",
+  "features": [
+    "lights",
+    "T1",
+    "RH_1",
+    "T2",
+    "RH_2",
+    "T3",
+    "RH_3",
+    "T4",
+    "RH_4",
+    "T5",
+    "RH_5",
+    "T6",
+    "RH_6",
+    "T7",
+    "RH_7",
+    "T8",
+    "RH_8",
+    "T9",
+    "RH_9",
+    "T_out",
+    "Press_mm_hg",
+    "RH_out",
+    "Windspeed",
+    "Visibility",
+    "Tdewpoint",
+    "rv1",
+    "rv2"
+  ],
+  "split_file": "data/splits.json",
+  "report_file": "reports/eda_report.html",
+  "metrics": {
+    "source": {
+      "file": "data/raw/energydata_complete.csv",
+      "sha256": "2820bf712ad0275cb18b85a05250926100d8e65ebb9f4d2d016ca91ea152a25d"
+    },
+    "split": {
+      "method": "chronological, no shuffle",
+      "ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "csv_sha256": "2820bf712ad0275cb18b85a05250926100d8e65ebb9f4d2d016ca91ea152a25d",
+      "splits": {
+        "train": {
+          "start_row": 0,
+          "end_row_exclusive": 13814,
+          "rows": 13814,
+          "start_time": "2016-01-11 17:00:00",
+          "end_time": "2016-04-16 15:10:00"
+        },
+        "val": {
+          "start_row": 13814,
+          "end_row_exclusive": 16774,
+          "rows": 2960,
+          "start_time": "2016-04-16 15:20:00",
+          "end_time": "2016-05-07 04:30:00"
+        },
+        "test": {
+          "start_row": 16774,
+          "end_row_exclusive": 19735,
+          "rows": 2961,
+          "start_time": "2016-05-07 04:40:00",
+          "end_time": "2016-05-27 18:00:00"
+        }
+      }
+    },
+    "integrity": {
+      "rows": 19735,
+      "columns": 29,
+      "features": 27,
+      "start": "2016-01-11 17:00:00",
+      "end": "2016-05-27 18:00:00",
+      "span_days": 137.042,
+      "step_counts": {
+        "0 days 00:10:00": 19734
+      },
+      "irregular_steps": 0,
+      "missing_values": 0,
+      "duplicate_timestamps": 0,
+      "duplicate_rows_excluding_time": 0,
+      "non_finite": 0
+    },
+    "target": {
+      "unit": "Wh / 10 phút",
+      "mean": 97.695,
+      "std": 102.5249,
+      "min": 10.0,
+      "max": 1080.0,
+      "percentiles": {
+        "1": 20.0,
+        "5": 30.0,
+        "25": 50.0,
+        "50": 60.0,
+        "75": 100.0,
+        "90": 196.0,
+        "95": 330.0,
+        "99": 576.6
+      },
+      "skew": 3.3864,
+      "skew_log1p": 1.1903,
+      "excess_kurtosis": 13.6679,
+      "unique_values": 92,
+      "all_multiples_of_10": true,
+      "top_values": {
+        "50": 4368,
+        "60": 3282,
+        "40": 2019,
+        "70": 1560,
+        "80": 1205
+      },
+      "top10pct_points_energy_share": 0.3708,
+      "abs_step_change_ge_200": 822,
+      "step_change_abs_p99": 330.0
+    },
+    "seasonality_train": {
+      "hourly_mean": {
+        "0": 52.448,
+        "1": 50.208,
+        "2": 47.5,
+        "3": 46.58,
+        "4": 47.708,
+        "5": 48.073,
+        "6": 54.358,
+        "7": 70.538,
+        "8": 104.878,
+        "9": 113.559,
+        "10": 126.215,
+        "11": 136.771,
+        "12": 127.847,
+        "13": 133.229,
+        "14": 114.323,
+        "15": 110.874,
+        "16": 114.123,
+        "17": 143.733,
+        "18": 204.132,
+        "19": 154.948,
+        "20": 133.507,
+        "21": 105.712,
+        "22": 73.177,
+        "23": 56.406
+      },
+      "hourly_median": {
+        "0": 50.0,
+        "1": 50.0,
+        "2": 50.0,
+        "3": 50.0,
+        "4": 50.0,
+        "5": 50.0,
+        "6": 50.0,
+        "7": 50.0,
+        "8": 60.0,
+        "9": 70.0,
+        "10": 70.0,
+        "11": 70.0,
+        "12": 80.0,
+        "13": 80.0,
+        "14": 70.0,
+        "15": 80.0,
+        "16": 80.0,
+        "17": 90.0,
+        "18": 120.0,
+        "19": 110.0,
+        "20": 110.0,
+        "21": 90.0,
+        "22": 60.0,
+        "23": 50.0
+      },
+      "dow_mean": {
+        "T2": 124.08,
+        "T3": 92.723,
+        "T4": 94.554,
+        "T5": 90.188,
+        "T6": 96.255,
+        "T7": 99.649,
+        "CN": 95.011
+      },
+      "peak_hour": 18,
+      "lowest_hour": 3,
+      "peak_to_low_ratio": 4.3824,
+      "weekday_mean": 99.309,
+      "weekend_mean": 97.385,
+      "night_0_6_mean": 48.753
+    },
+    "autocorrelation_train": {
+      "acf_raw": {
+        "1": 0.7588,
+        "2": 0.5456,
+        "3": 0.4432,
+        "6": 0.3245,
+        "12": 0.3128,
+        "18": 0.1763,
+        "36": 0.0109,
+        "72": -0.1066,
+        "144": 0.206,
+        "288": 0.1655
+      },
+      "acf_log1p": {
+        "1": 0.8332,
+        "2": 0.6978,
+        "3": 0.6049,
+        "6": 0.5031,
+        "12": 0.4374,
+        "18": 0.2914,
+        "36": 0.0249,
+        "72": -0.1489,
+        "144": 0.3486,
+        "288": 0.2896
+      },
+      "pacf_log1p": {
+        "1": 0.8332,
+        "2": 0.0118,
+        "3": 0.0673,
+        "4": 0.1053,
+        "5": 0.0875,
+        "6": 0.0325,
+        "7": 0.0426,
+        "8": 0.0847,
+        "9": 0.0675,
+        "10": 0.0341,
+        "11": 0.0066,
+        "12": 0.0325,
+        "13": 0.0174,
+        "14": -0.0201,
+        "15": -0.0143,
+        "16": -0.0034,
+        "17": -0.0479,
+        "18": -0.0186,
+        "19": -0.0199,
+        "20": -0.0088,
+        "21": -0.028,
+        "22": -0.0122,
+        "23": -0.0042,
+        "24": -0.0244,
+        "25": -0.0186,
+        "26": -0.0081,
+        "27": 0.0042,
+        "28": 0.0009,
+        "29": 0.0024,
+        "30": 0.006,
+        "31": -0.0068,
+        "32": -0.0075,
+        "33": -0.0084,
+        "34": -0.0227,
+        "35": -0.0105,
+        "36": 0.0069
+      },
+      "confidence_95": 0.01668,
+      "first_lag_acf_log1p_below_0.2": 23,
+      "local_max_lag_near_1day": 144,
+      "pacf_significant_lags": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        17,
+        18,
+        19,
+        21,
+        24,
+        25,
+        34
+      ]
+    },
+    "correlation_train": {
+      "lights": {
+        "pearson": 0.2255,
+        "spearman": 0.3542,
+        "pearson_with_next_step": 0.2161
+      },
+      "T2": {
+        "pearson": 0.1496,
+        "spearman": 0.3246,
+        "pearson_with_next_step": 0.1402
+      },
+      "T1": {
+        "pearson": 0.0839,
+        "spearman": 0.2653,
+        "pearson_with_next_step": 0.0728
+      },
+      "T8": {
+        "pearson": 0.0719,
+        "spearman": 0.258,
+        "pearson_with_next_step": 0.0668
+      },
+      "T4": {
+        "pearson": 0.077,
+        "spearman": 0.2405,
+        "pearson_with_next_step": 0.067
+      },
+      "T3": {
+        "pearson": 0.1214,
+        "spearman": 0.2385,
+        "pearson_with_next_step": 0.11
+      },
+      "RH_8": {
+        "pearson": -0.1159,
+        "spearman": -0.2345,
+        "pearson_with_next_step": -0.112
+      },
+      "RH_out": {
+        "pearson": -0.1471,
+        "spearman": -0.2201,
+        "pearson_with_next_step": -0.1451
+      },
+      "T6": {
+        "pearson": 0.1081,
+        "spearman": 0.1985,
+        "pearson_with_next_step": 0.1085
+      },
+      "T7": {
+        "pearson": 0.0511,
+        "spearman": 0.1925,
+        "pearson_with_next_step": 0.05
+      },
+      "RH_6": {
+        "pearson": -0.0839,
+        "spearman": -0.1857,
+        "pearson_with_next_step": -0.0826
+      },
+      "T5": {
+        "pearson": 0.0312,
+        "spearman": 0.1818,
+        "pearson_with_next_step": 0.0251
+      },
+      "T9": {
+        "pearson": 0.027,
+        "spearman": 0.1776,
+        "pearson_with_next_step": 0.0271
+      },
+      "T_out": {
+        "pearson": 0.0928,
+        "spearman": 0.1731,
+        "pearson_with_next_step": 0.0922
+      },
+      "RH_9": {
+        "pearson": -0.0663,
+        "spearman": -0.1664,
+        "pearson_with_next_step": -0.061
+      },
+      "RH_7": {
+        "pearson": -0.0714,
+        "spearman": -0.1293,
+        "pearson_with_next_step": -0.0697
+      },
+      "Press_mm_hg": {
+        "pearson": -0.0353,
+        "spearman": -0.1206,
+        "pearson_with_next_step": -0.0362
+      },
+      "RH_2": {
+        "pearson": -0.0551,
+        "spearman": -0.0899,
+        "pearson_with_next_step": -0.0564
+      },
+      "Windspeed": {
+        "pearson": 0.0659,
+        "spearman": 0.0826,
+        "pearson_with_next_step": 0.0692
+      },
+      "RH_1": {
+        "pearson": 0.0893,
+        "spearman": 0.0724,
+        "pearson_with_next_step": 0.0741
+      },
+      "Tdewpoint": {
+        "pearson": 0.0103,
+        "spearman": 0.0607,
+        "pearson_with_next_step": 0.0107
+      },
+      "RH_5": {
+        "pearson": -0.002,
+        "spearman": -0.0559,
+        "pearson_with_next_step": -0.0134
+      },
+      "RH_3": {
+        "pearson": 0.0334,
+        "spearman": -0.048,
+        "pearson_with_next_step": 0.023
+      },
+      "RH_4": {
+        "pearson": -0.0028,
+        "spearman": -0.0263,
+        "pearson_with_next_step": -0.0038
+      },
+      "Visibility": {
+        "pearson": -0.0079,
+        "spearman": -0.0125,
+        "pearson_with_next_step": -0.009
+      },
+      "rv1": {
+        "pearson": -0.0093,
+        "spearman": -0.0083,
+        "pearson_with_next_step": -0.0144
+      },
+      "rv2": {
+        "pearson": -0.0093,
+        "spearman": -0.0083,
+        "pearson_with_next_step": -0.0144
+      }
+    },
+    "feature_collinearity_train": {
+      "pairs_abs_ge_0.9": 2,
+      "top10": [
+        {
+          "a": "rv1",
+          "b": "rv2",
+          "pearson": 1.0
+        },
+        {
+          "a": "T6",
+          "b": "T_out",
+          "pearson": 0.9739
+        },
+        {
+          "a": "RH_4",
+          "b": "RH_7",
+          "pearson": 0.8995
+        },
+        {
+          "a": "RH_3",
+          "b": "RH_4",
+          "pearson": 0.8981
+        },
+        {
+          "a": "RH_7",
+          "b": "RH_8",
+          "pearson": 0.8807
+        },
+        {
+          "a": "T7",
+          "b": "T9",
+          "pearson": 0.8806
+        },
+        {
+          "a": "RH_1",
+          "b": "RH_4",
+          "pearson": 0.8607
+        },
+        {
+          "a": "RH_8",
+          "b": "RH_9",
+          "pearson": 0.8512
+        },
+        {
+          "a": "RH_4",
+          "b": "RH_9",
+          "pearson": 0.8482
+        },
+        {
+          "a": "RH_7",
+          "b": "RH_9",
+          "pearson": 0.8479
+        }
+      ]
+    },
+    "lights_train": {
+      "mean": 98.775,
+      "lights_off": {
+        "rows": 10123,
+        "mean": 83.761
+      },
+      "lights_on": {
+        "rows": 3691,
+        "mean": 139.954
+      },
+      "zero_share": 0.7328
+    },
+    "random_variables": {
+      "rv1_equals_rv2": true,
+      "rv1": {
+        "pearson": -0.0093,
+        "spearman": -0.0083,
+        "pearson_with_next_step": -0.0144
+      },
+      "rv2": {
+        "pearson": -0.0093,
+        "spearman": -0.0083,
+        "pearson_with_next_step": -0.0144
+      }
+    },
+    "split_summary": {
+      "train": {
+        "rows": 13814,
+        "target_mean": 98.7752,
+        "target_median": 60.0
+      },
+      "val": {
+        "rows": 2960,
+        "target_mean": 93.4223,
+        "target_median": 60.0
+      },
+      "test": {
+        "rows": 2961,
+        "target_mean": 96.9267,
+        "target_median": 60.0
+      }
+    },
+    "distribution_shift": {
+      "Appliances": {
+        "val": {
+          "ks": 0.09701,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.15362,
+          "outside_train_range_share": 0.0
+        }
+      },
+      "lights": {
+        "val": {
+          "ks": 0.11719,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.14966,
+          "outside_train_range_share": 0.0
+        }
+      },
+      "T1": {
+        "val": {
+          "ks": 0.28617,
+          "outside_train_range_share": 0.025
+        },
+        "test": {
+          "ks": 0.93208,
+          "outside_train_range_share": 0.55117
+        }
+      },
+      "RH_1": {
+        "val": {
+          "ks": 0.45733,
+          "outside_train_range_share": 0.01791
+        },
+        "test": {
+          "ks": 0.2658,
+          "outside_train_range_share": 0.00473
+        }
+      },
+      "T2": {
+        "val": {
+          "ks": 0.21762,
+          "outside_train_range_share": 0.05574
+        },
+        "test": {
+          "ks": 0.75888,
+          "outside_train_range_share": 0.2641
+        }
+      },
+      "RH_2": {
+        "val": {
+          "ks": 0.37304,
+          "outside_train_range_share": 0.04662
+        },
+        "test": {
+          "ks": 0.19372,
+          "outside_train_range_share": 0.06687
+        }
+      },
+      "T3": {
+        "val": {
+          "ks": 0.49314,
+          "outside_train_range_share": 0.00946
+        },
+        "test": {
+          "ks": 0.94076,
+          "outside_train_range_share": 0.10773
+        }
+      },
+      "RH_3": {
+        "val": {
+          "ks": 0.60757,
+          "outside_train_range_share": 0.00743
+        },
+        "test": {
+          "ks": 0.05024,
+          "outside_train_range_share": 0.01452
+        }
+      },
+      "T4": {
+        "val": {
+          "ks": 0.46241,
+          "outside_train_range_share": 0.02973
+        },
+        "test": {
+          "ks": 0.98031,
+          "outside_train_range_share": 0.64607
+        }
+      },
+      "RH_4": {
+        "val": {
+          "ks": 0.50719,
+          "outside_train_range_share": 0.01149
+        },
+        "test": {
+          "ks": 0.16127,
+          "outside_train_range_share": 0.00608
+        }
+      },
+      "T5": {
+        "val": {
+          "ks": 0.5067,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.89472,
+          "outside_train_range_share": 0.49105
+        }
+      },
+      "RH_5": {
+        "val": {
+          "ks": 0.33005,
+          "outside_train_range_share": 0.00946
+        },
+        "test": {
+          "ks": 0.15237,
+          "outside_train_range_share": 0.02297
+        }
+      },
+      "T6": {
+        "val": {
+          "ks": 0.21656,
+          "outside_train_range_share": 0.02973
+        },
+        "test": {
+          "ks": 0.69531,
+          "outside_train_range_share": 0.23235
+        }
+      },
+      "RH_6": {
+        "val": {
+          "ks": 0.65253,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.65692,
+          "outside_train_range_share": 0.0
+        }
+      },
+      "T7": {
+        "val": {
+          "ks": 0.42766,
+          "outside_train_range_share": 0.01047
+        },
+        "test": {
+          "ks": 0.98704,
+          "outside_train_range_share": 0.54306
+        }
+      },
+      "RH_7": {
+        "val": {
+          "ks": 0.45272,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.24863,
+          "outside_train_range_share": 0.0
+        }
+      },
+      "T8": {
+        "val": {
+          "ks": 0.38137,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.80546,
+          "outside_train_range_share": 0.29179
+        }
+      },
+      "RH_8": {
+        "val": {
+          "ks": 0.3653,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.13264,
+          "outside_train_range_share": 0.0
+        }
+      },
+      "T9": {
+        "val": {
+          "ks": 0.54713,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.99747,
+          "outside_train_range_share": 0.1817
+        }
+      },
+      "RH_9": {
+        "val": {
+          "ks": 0.4388,
+          "outside_train_range_share": 0.03007
+        },
+        "test": {
+          "ks": 0.2125,
+          "outside_train_range_share": 0.02229
+        }
+      },
+      "T_out": {
+        "val": {
+          "ks": 0.19283,
+          "outside_train_range_share": 0.01689
+        },
+        "test": {
+          "ks": 0.67138,
+          "outside_train_range_share": 0.154
+        }
+      },
+      "Press_mm_hg": {
+        "val": {
+          "ks": 0.26173,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.23187,
+          "outside_train_range_share": 0.0
+        }
+      },
+      "RH_out": {
+        "val": {
+          "ks": 0.24357,
+          "outside_train_range_share": 0.10203
+        },
+        "test": {
+          "ks": 0.22652,
+          "outside_train_range_share": 0.04019
+        }
+      },
+      "Windspeed": {
+        "val": {
+          "ks": 0.18587,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.22617,
+          "outside_train_range_share": 0.0
+        }
+      },
+      "Visibility": {
+        "val": {
+          "ks": 0.20544,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.14636,
+          "outside_train_range_share": 0.0
+        }
+      },
+      "Tdewpoint": {
+        "val": {
+          "ks": 0.15356,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.64703,
+          "outside_train_range_share": 0.31982
+        }
+      },
+      "rv1": {
+        "val": {
+          "ks": 0.01403,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.01389,
+          "outside_train_range_share": 0.0
+        }
+      },
+      "rv2": {
+        "val": {
+          "ks": 0.01403,
+          "outside_train_range_share": 0.0
+        },
+        "test": {
+          "ks": 0.01389,
+          "outside_train_range_share": 0.0
+        }
+      }
+    },
+    "normalization_train": {
+      "Appliances": {
+        "mean": 98.775156,
+        "std": 106.853424
+      },
+      "lights": {
+        "mean": 4.551904,
+        "std": 8.616368
+      },
+      "T1": {
+        "mean": 21.069756,
+        "std": 1.24206
+      },
+      "RH_1": {
+        "mean": 40.403839,
+        "std": 3.555014
+      },
+      "T2": {
+        "mean": 19.584244,
+        "std": 1.485069
+      },
+      "RH_2": {
+        "mean": 40.881499,
+        "std": 3.255624
+      },
+      "T3": {
+        "mean": 21.418166,
+        "std": 1.465673
+      },
+      "RH_3": {
+        "mean": 39.798476,
+        "std": 3.126312
+      },
+      "T4": {
+        "mean": 19.960589,
+        "std": 1.469315
+      },
+      "RH_4": {
+        "mean": 39.465291,
+        "std": 4.241742
+      },
+      "T5": {
+        "mean": 18.803833,
+        "std": 1.28134
+      },
+      "RH_5": {
+        "mean": 51.881423,
+        "std": 8.982444
+      },
+      "T6": {
+        "mean": 5.958728,
+        "std": 4.642854
+      },
+      "RH_6": {
+        "mean": 67.363204,
+        "std": 25.741842
+      },
+      "T7": {
+        "mean": 19.382978,
+        "std": 1.569658
+      },
+      "RH_7": {
+        "mean": 35.609929,
+        "std": 5.047454
+      },
+      "T8": {
+        "mean": 21.331662,
+        "std": 1.735052
+      },
+      "RH_8": {
+        "mean": 43.313175,
+        "std": 5.313581
+      },
+      "T9": {
+        "mean": 18.594411,
+        "std": 1.417468
+      },
+      "RH_9": {
+        "mean": 41.955006,
+        "std": 3.92787
+      },
+      "T_out": {
+        "mean": 5.71709,
+        "std": 4.148062
+      },
+      "Press_mm_hg": {
+        "mean": 755.119577,
+        "std": 8.029047
+      },
+      "RH_out": {
+        "mean": 82.581077,
+        "std": 12.322031
+      },
+      "Windspeed": {
+        "mean": 4.358236,
+        "std": 2.646635
+      },
+      "Visibility": {
+        "mean": 38.892657,
+        "std": 12.922482
+      },
+      "Tdewpoint": {
+        "mean": 2.755081,
+        "std": 3.684688
+      },
+      "rv1": {
+        "mean": 24.997152,
+        "std": 14.541756
+      },
+      "rv2": {
+        "mean": 24.997152,
+        "std": 14.541756
+      },
+      "log1p_target": {
+        "mean": 4.305838,
+        "std": 0.681039
+      }
+    },
+    "baselines_validation": {
+      "horizon": "1 step (10 min)",
+      "unit": "Wh",
+      "results": {
+        "Persistence: ŷ(t+1) = y(t)": {
+          "rmse": 66.4297,
+          "mae": 26.1622,
+          "r2": 0.48133,
+          "n": 2960
+        },
+        "Seasonal naive: ŷ(t+1) = y(t+1−144)": {
+          "rmse": 115.3838,
+          "mae": 53.3209,
+          "r2": -0.5648,
+          "n": 2960
+        },
+        "Trung bình theo giờ (fit trên train)": {
+          "rmse": 87.2303,
+          "mae": 48.5457,
+          "r2": 0.10566,
+          "n": 2960
+        },
+        "Trung bình train (hằng số)": {
+          "rmse": 92.3943,
+          "mae": 53.9678,
+          "r2": -0.00337,
+          "n": 2960
+        },
+        "Trung vị train (hằng số)": {
+          "rmse": 98.1076,
+          "mae": 42.6047,
+          "r2": -0.13129,
+          "n": 2960
+        }
+      }
+    },
+    "model_input_suggestion": {
+      "input_columns": [
+        "Appliances",
+        "lights",
+        "T1",
+        "RH_1",
+        "T2",
+        "RH_2",
+        "T3",
+        "RH_3",
+        "T4",
+        "RH_4",
+        "T5",
+        "RH_5",
+        "T6",
+        "RH_6",
+        "T7",
+        "RH_7",
+        "T8",
+        "RH_8",
+        "T9",
+        "RH_9",
+        "T_out",
+        "Press_mm_hg",
+        "RH_out",
+        "Windspeed",
+        "Visibility",
+        "Tdewpoint"
+      ],
+      "features_dropped": [
+        "rv1",
+        "rv2"
+      ],
+      "n_numeric_columns": 26,
+      "time_encodings": [
+        "hour_sin",
+        "hour_cos"
+      ],
+      "n_input_channels": 28,
+      "target_transform_candidate": "log1p",
+      "window_candidates_steps": [
+        36,
+        72,
+        144
+      ],
+      "horizon_steps": 1,
+      "status": "đề xuất từ EDA, chưa kiểm chứng bằng mô hình"
+    }
+  },
+  "notes": [
+    "correlation, seasonality, ACF, normalization fit only on train rows",
+    "baselines evaluated on validation only; test used only for descriptive shift statistics",
+    "model_input_suggestion is a proposal derived from EDA, not a validated configuration"
+  ]
+}

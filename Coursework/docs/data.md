@@ -1,71 +1,163 @@
-# Coursework — Dữ liệu cho Knowledge Distillation
+# Coursework — Dữ liệu và kết luận EDA
 
-> **Trạng thái: chờ nhóm duyệt.** Dataset, split và EDA **kế thừa nguyên** từ LAB2; tài liệu này chỉ ghi phần khác biệt do distillation. Không sao chép bảng lớp, preprocessing hay EDA — xem [LAB2/Docs/data.md](../../LAB2/Docs/data.md).
+> **Trạng thái: đã chốt ngày 19/11/2026** (split 70/15/15 theo thời gian, rule cửa sổ ở §2). Tài liệu quy định dữ liệu, cách chia tập, hợp đồng đầu vào và các kết luận EDA phục vụ triển khai. Kiến trúc Transformer/LSTM thuộc `model.md`; độ dài cửa sổ, loss, lịch train và giao thức đánh giá thuộc `trainning.md`.
 
-## 1. Nguồn dữ liệu
+## 1. Dataset và trường dữ liệu
 
-| Nguồn | Vai trò | Trạng thái trên máy này |
-|---|---|---|
-| **CIFAR-10** qua `torchvision.datasets.CIFAR10` | Ảnh và nhãn cứng cho student và teacher | Chưa có (`LAB2/data/prepared/` không tồn tại) |
-| `LAB2/data/splits.npz` | Split train fit / validation cố định, seed 42 | Chưa có — bị loại khỏi Git |
-| Checkpoint teacher `LAB2/checkpoints/checkpoint_best_global.pt` (run `02_resnet18_fine_tune`, SHA-256 `b55b143e…a7`) | Sinh soft label | Chưa có — bị loại khỏi Git |
+Dùng **UCI Appliances Energy Prediction** ([trang dataset](https://archive.ics.uci.edu/dataset/374/appliances+energy+prediction)), file `energydata_complete.csv` đặt tại `Coursework/data/raw/` (thư mục `data/` bị loại khỏi Git).
 
-Dùng lại cùng split với LAB2 là bắt buộc: teacher đã chọn checkpoint bằng validation này, nên student phải đánh giá trên đúng validation/test đó để so sánh hợp lệ.
+| Thuộc tính | Giá trị đã kiểm tra |
+|---|---|
+| Số dòng / cột | 19.735 / 29 (`date`, mục tiêu, 27 đặc trưng) |
+| Thời gian | 11/01/2016 17:00 → 27/05/2016 18:00, 137 ngày |
+| Bước thời gian | Đều 10 phút; 0 bước bất thường, 0 timestamp trùng |
+| Giá trị thiếu / không hữu hạn | 0 / 0 |
+| SHA-256 file | `2820bf71…a152a25d` (đầy đủ trong `eda_stats.json`) |
 
-## 2. Trường dữ liệu
-
-| Trường | Kiểu / shape | Nguồn | Ghi chú |
+| Nhóm | Cột | Ý nghĩa | Đơn vị |
 |---|---|---|---|
-| `image` | `uint8` `[32,32,3]` | CIFAR-10 | Định nghĩa đầy đủ: [LAB2 data.md §1](../../LAB2/Docs/data.md#1-dataset-và-nhãn) |
-| `label` | `int` 0–9 | CIFAR-10 | Thứ tự lớp giữ nguyên như LAB2 |
-| `teacher_logits` | `float32` `[10]` mỗi ảnh | Teacher (mới) | Chưa softmax; temperature áp dụng khi train, thuộc đặc tả phương pháp |
+| **Mục tiêu** | `Appliances` | Điện năng thiết bị gia dụng trong 10 phút | Wh |
+| Năng lượng | `lights` | Điện năng đèn trong 10 phút | Wh |
+| Cảm biến trong nhà | `T1`–`T9`, `RH_1`–`RH_9` | Nhiệt độ, độ ẩm: 1 bếp, 2 phòng khách, 3 phòng giặt, 4 văn phòng, 5 phòng tắm, **6 ngoài nhà phía bắc**, 7 phòng ủi, 8 phòng ngủ con, 9 phòng ngủ bố mẹ | °C, % |
+| Trạm thời tiết Chièvres | `T_out`, `Press_mm_hg`, `RH_out`, `Windspeed`, `Visibility`, `Tdewpoint` | Dữ liệu theo giờ, được nội suy về 10 phút | °C, mm Hg, %, m/s, km, °C |
+| Biến ngẫu nhiên | `rv1`, `rv2` | Tác giả thêm vào để kiểm tra chọn đặc trưng | — |
 
-### 2.1. Hai đầu vào khác nhau
+Cảm biến trong nhà gửi khoảng 3,3 phút/lần và được lấy trung bình theo 10 phút; điện năng đo bằng đồng hồ M-Bus mỗi 10 phút.
 
-| | Teacher | Student |
-|---|---|---|
-| Kích thước | Resize cạnh ngắn 256 → center crop 224×224, theo [LAB2 data.md §3](../../LAB2/Docs/data.md#3-hợp-đồng-preprocessing) | Giữ nguyên 32×32 |
-| Normalize | ImageNet mean/std (bắt buộc với weights pretrained) | **Thống kê CIFAR-10 trên 45.000 ảnh train fit** đã tính ở [LAB2 data.md §4.2](../../LAB2/Docs/data.md#42-màu-sắc-và-đặc-trưng-theo-lớp): mean `(0.49184, 0.48254, 0.44682)`, std `(0.24705, 0.24354, 0.26169)` |
+## 2. Bài toán và split theo thời gian
 
-Student train từ đầu nên normalize theo dataset, cùng tiền lệ LAB1 ([LAB1 data.md](../../LAB1/docs/data.md)). Quy định "không thay ImageNet mean/std" của LAB2 chỉ áp dụng cho mạng pretrained. Nếu student đổi sang mạng pretrained thì phải quay lại ImageNet. Không đưa ảnh 224×224 vào student.
+**Bài toán:** dự báo `Appliances` tại mốc `t+1` (10 phút tới) từ cửa sổ `W` mốc đa biến `t−W+1 … t`. Độ dài `W` chọn bằng validation ở `trainning.md`.
 
-### 2.2. Soft label tính online
+| Tập | Số mốc | Từ | Đến | Mục đích |
+|---|---:|---|---|---|
+| Train | 13.814 (70%) | 11/01/2016 17:00 | 16/04/2016 15:10 | Học trọng số; fit chuẩn hoá và mọi thống kê cần học |
+| Validation | 2.960 (15%) | 16/04/2016 15:20 | 07/05/2016 04:30 | Chọn cấu hình, cửa sổ, epoch, checkpoint |
+| Test | 2.961 (15%) | 07/05/2016 04:40 | 27/05/2016 18:00 | Đánh giá cuối, một lần |
 
-Logits teacher được **tính trong lúc train**, trên chính batch đã augmentation mà student nhận, không tính trước:
+Chia **theo thứ tự thời gian, không xáo**: validation và test là tương lai so với train, giống điều kiện triển khai. Ranh giới sinh tất định bởi `EDA.py` và lưu ở `data/splits.json`.
 
-- Teacher đã train với crop, flip, ColorJitter `p=0.8` và RandomErasing ([LAB2 trainning.md §2.1](../../LAB2/Docs/trainning.md#21-augmentation)); soft label tính trước trên ảnh gốc không khớp ảnh student thật sự thấy.
-- Chi phí ước lượng: LAB2 forward 10.000 ảnh test mất 11.8 s, cả vòng inference 38.9 s trên RTX 3050 → thêm khoảng 1–3 phút cho 45.000 ảnh mỗi epoch. Đây là suy ra từ số đo test, chưa đo trong training.
-- Hệ quả: phép biến đổi hình học áp lên ảnh 32×32 **một lần**, rồi tách hai nhánh — giữ 32×32 cho student, phóng lên 224 cho teacher — để hai mạng nhìn cùng nội dung. Thứ tự và tham số augmentation thuộc đặc tả phương pháp (mục 7).
+**Tránh rò rỉ dữ liệu:**
 
-## 3. Quy mô dự kiến
+- Một mẫu thuộc tập chứa **mốc mục tiêu** của nó. Cửa sổ đầu vào chỉ gồm mốc trước mục tiêu nên được lấy lịch sử của tập liền trước. Đây là dữ liệu quá khứ, không phải leakage, và mọi mốc của validation/test đều được đánh giá.
+- Không mẫu train nào có mục tiêu thuộc validation/test.
+- Mean/std chuẩn hoá chỉ fit trên train. Cắt cửa sổ trên chuỗi giữ nguyên thứ tự thời gian.
 
-| Tập | Số ảnh | Dùng cho |
-|---|---:|---|
-| Train fit | 45.000 | Train student; sinh soft label |
-| Validation | 5.000 | Chọn checkpoint student và cấu hình KD |
-| Test | 10.000 | Đánh giá cuối, một lần |
+## 3. Hợp đồng đầu vào
 
-Logits teacher sinh online nên không lưu thành file. Baseline student train thường chạy 3 seed trên cùng split này (quy trình tại [lab-description.md §4.3](lab-description.md#43-quy-trình-chốt-ngưỡng)); split không đổi giữa các seed.
+| Bước / đầu ra | Yêu cầu |
+|---|---|
+| Cột số | 26 cột: lịch sử `Appliances` (tín hiệu mạnh nhất, §4.3), `lights`, `T1`–`T9`, `RH_1`–`RH_9`, 6 biến thời tiết. **Loại `rv1`, `rv2`** (§4.5) |
+| Mã hoá thời gian | Thêm sin/cos giờ trong ngày (theo phút) tính từ `date`. Không mã hoá thứ trong tuần vì chênh lệch theo thứ nhỏ (§4.2) |
+| Chuẩn hoá | z-score 26 cột số bằng mean/std của train (`metrics.normalization_train`); sin/cos giữ nguyên |
+| Mục tiêu | Thang chuẩn hoá mặc định; `log1p` là phương án thử (mean 4.30584, std 0.68104 trên train). Metric **luôn tính trên Wh** sau khi đảo biến đổi |
+| Batch | `x`: `[B, W, 28]`, `float32`, hữu hạn; `y`: `[B, 1]`; phần tử cuối cửa sổ là mốc `t`. Chọn `W` thuộc [trainning.md](trainning.md) |
 
-**Rò rỉ dữ liệu:** không dùng ảnh test hay logits teacher trên test để train hoặc chốt ngưỡng. Teacher được fine-tune chỉ trên train fit nên logits của teacher trên train fit thường tự tin hơn trên ảnh chưa thấy; đây là đặc điểm cần ghi nhận khi phân tích, không phải leakage.
+## 4. Kết quả EDA và ý nghĩa sử dụng
 
-## 4. Quyền sử dụng
+Nguồn: [báo cáo EDA HTML](../reports/eda_report.html), [số liệu JSON](../reports/eda_stats.json). Thống kê dùng để fit (tương quan, ACF, profile giờ, chuẩn hoá) tính **chỉ trên train**. Số hiển thị đã làm tròn; khi tính toán dùng giá trị gốc trong JSON.
 
-Đã đối chiếu nguồn gốc ngày 17/11/2026.
+### 4.1. Biến mục tiêu lệch mạnh và có đỉnh
 
-| Thành phần | Điều khoản | Áp dụng cho coursework |
-|---|---|---|
-| CIFAR-10 | [Trang dataset](https://www.cs.toronto.edu/~kriz/cifar.html) không ghi giấy phép; chỉ yêu cầu trích dẫn khi sử dụng: Krizhevsky, A. (2009). *Learning Multiple Layers of Features from Tiny Images*. | Bắt buộc trích dẫn báo cáo này trong tài liệu và báo cáo cuối |
-| Mã nguồn torchvision | [BSD 3-Clause](https://github.com/pytorch/vision/blob/main/LICENSE) | Được dùng tự do; không sửa hay phân phối lại thư viện |
-| Weights `ResNet18_Weights.IMAGENET1K_V1` | [Tài liệu torchvision](https://docs.pytorch.org/vision/stable/models.html): weights "may have their own licenses or terms and conditions derived from the dataset used for training"; người dùng tự xác định quyền sử dụng | Weights train trên ImageNet; [điều khoản ImageNet](https://image-net.org/download.php) giới hạn **"non-commercial research and educational purposes"** |
+| Chỉ số | Giá trị |
+|---|---:|
+| Trung bình / trung vị | 97.7 / 60 Wh |
+| p95 / p99 / max | 330 / 576.6 / 1080 Wh |
+| Skewness: gốc / sau `log1p` | 3.39 / 1.19 |
+| Tỉ trọng năng lượng của 10% mốc cao nhất | 37.1% |
+| Số bước nhảy \|Δ\| ≥ 200 Wh giữa hai mốc liền kề | 822 |
 
-**Kết luận:** coursework là mục đích học tập, phi thương mại nên nằm trong phạm vi cho phép. Điều khoản ImageNet viết cho *database*; việc nó ràng buộc trực tiếp đến weights hay không, torchvision không khẳng định. Vì vậy coi giới hạn phi thương mại là ràng buộc của cả teacher và student được distill từ teacher. Không dùng các checkpoint này cho mục đích thương mại và không phân phối lại dataset.
+![Phân phối mục tiêu](assets/eda_target_distribution.png)
 
-## 5. Phương án thay thế
+- Mục tiêu chỉ có 92 giá trị, đều là bội số của 10 Wh. Đây là độ phân giải của đồng hồ đo, không phải lỗi. Không làm mịn hay loại outlier.
+- Đỉnh ngắn nhưng chiếm nhiều năng lượng, nên MSE/RMSE trên thang gốc bị đỉnh chi phối. Vì vậy phải **báo cáo cả MAE và RMSE**, và cần thí nghiệm `log1p` (§3).
+
+### 4.2. Chu kỳ ngày rõ, chu kỳ tuần yếu
+
+![Profile theo giờ và heatmap thứ × giờ](assets/eda_seasonality.png)
+
+- Trung bình theo giờ trên train cao nhất lúc **18h (204.1 Wh)**, thấp nhất lúc **3h (46.6 Wh)**, gấp 4.38 lần. Trung bình 0h–6h là 48.8 Wh.
+- Ngày thường 99.3 Wh, cuối tuần 97.4 Wh, gần như không khác. Riêng thứ Hai cao nhất (124.1 Wh); chưa kiểm chứng đây là quy luật hay do vài ngày cá biệt.
+- IQR cùng một giờ rất rộng, nên biết giờ là cần nhưng không đủ để đoán đỉnh. Đây là căn cứ thêm mã hoá giờ ở §3.
+
+### 4.3. Tự tương quan và độ dài cửa sổ
+
+| Độ trễ | 10 phút | 1 giờ | 2 giờ | 6 giờ | 12 giờ | 24 giờ |
+|---|---:|---:|---:|---:|---:|---:|
+| ACF gốc | 0.759 | 0.325 | 0.313 | 0.011 | −0.107 | 0.206 |
+| ACF `log1p` | 0.833 | 0.503 | 0.437 | 0.025 | −0.149 | 0.349 |
+
+![ACF và PACF](assets/eda_acf.png)
+
+- Thông tin gần nhất mạnh nhất; ACF `log1p` giảm dưới 0.2 sau 23 bước (khoảng 3.8 giờ). Tương quan **quay lại tại 24 h** (lag 144 là cực đại cục bộ).
+- **Gợi ý cho [trainning.md](trainning.md):** `W = 36` (6 giờ) bao trọn đoạn ACF còn cao. Khi khảo sát `W`, nên có thêm 144 (24 giờ), vì chỉ cửa sổ này chứa mốc cùng giờ hôm trước.
+
+### 4.4. Tương quan đặc trưng với mục tiêu yếu
+
+![Tương quan với mục tiêu và giữa các đặc trưng](assets/eda_correlation.png)
+
+- \|Spearman\| lớn nhất với mục tiêu: `lights` 0.354, `T2` 0.325, `T1` 0.265; mọi \|Pearson\| ≤ 0.226. Không đặc trưng nào tự nó dự báo tốt.
+- Khi bật đèn (26.7% số mốc train), `Appliances` trung bình 140.0 Wh, so với 83.8 Wh khi tắt. Đèn là chỉ báo "có người hoạt động".
+- `T6`–`T_out` tương quan 0.974 (cùng đo ngoài trời). Các độ ẩm trong nhà tương quan 0.85–0.90. Giữ cả hai nhóm; attention/ablation sẽ cho biết nhóm nào có ích.
+- **Hệ quả:** tín hiệu chính nằm ở lịch sử của mục tiêu và giờ trong ngày. Việc cảm biến có giúp thêm hay không là **giả thuyết** để so Transformer/LSTM có và không có nhóm cảm biến. Không kết luận từ tương quan tuyến tính.
+
+### 4.5. `rv1`, `rv2` là nhiễu
+
+`rv1` và `rv2` **giống hệt nhau từng giá trị**, và tương quan Pearson với mục tiêu là −0.009 trên train. Loại cả hai khỏi đầu vào (§3). Nếu nhóm muốn dùng làm đối chứng cho attention map, phải đặc tả rõ ở `model.md`.
+
+### 4.6. Lệch phân phối theo mùa giữa các tập
+
+![KS so với train và phân phối mục tiêu theo tập](assets/eda_split_shift.png)
+
+| Đặc trưng | KS train–val | KS train–test |
+|---|---:|---:|
+| `T9` (lệch lớn nhất) | 0.547 | 0.997 |
+| `T2` | 0.218 | 0.759 |
+| `T_out` | 0.193 | 0.671 |
+| `RH_6` | 0.653 | 0.657 |
+| `Appliances` | 0.097 | 0.154 |
+
+- Train là mùa đông (tháng 1–4), test là cuối mùa xuân (tháng 5). Nhiệt độ trong nhà và ngoài trời tăng rõ ([biểu đồ thời gian](assets/eda_timeline.png)). Có **12/25 đặc trưng có hơn 5% giá trị test nằm ngoài khoảng [min, max] của train**.
+- Mục tiêu lệch ít hơn: trung vị 60 Wh ở cả ba tập, trung bình 98.8 / 93.4 / 96.9 Wh.
+- **Hệ quả:** mô hình dựa vào nhiệt độ tuyệt đối có nguy cơ ngoại suy kém. Sai số test có thể cao hơn validation vì lý do này, cần ghi nhận khi đánh giá thay vì sửa split. Không chuẩn hoá lại bằng thống kê validation/test.
+
+### 4.7. Baseline tham chiếu trên validation
+
+Dự báo 1 bước không dùng học máy, tính trên 2.960 mốc validation:
+
+| Baseline | RMSE (Wh) | MAE (Wh) | R² |
+|---|---:|---:|---:|
+| **Persistence**: `ŷ(t+1) = y(t)` | **66.43** | **26.16** | **0.481** |
+| Trung bình theo giờ (fit train) | 87.23 | 48.55 | 0.106 |
+| Trung bình train (hằng số) | 92.39 | 53.97 | −0.003 |
+| Seasonal naive: `ŷ(t+1) = y(t+1−144)` | 115.38 | 53.32 | −0.565 |
+
+![Baseline trên validation](assets/eda_baseline.png)
+
+Persistence là mốc sàn mạnh nhất. LSTM và Transformer phải vượt mốc này mới có giá trị. Ngưỡng cụ thể đặt ở [lab-description.md §4](lab-description.md). Đây là số đo của baseline, không phải kết quả mô hình.
+
+## 5. Quyền sử dụng
+
+Dataset phát hành theo **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)** trên UCI: được dùng, chỉnh sửa cho mọi mục đích với điều kiện ghi nguồn. Tài liệu và báo cáo cuối phải trích dẫn:
+
+- Candanedo, L. (2017). *Appliances Energy Prediction* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5VC8G
+- Candanedo, L. M., Feldheim, V., & Deramaix, D. (2017). Data driven prediction models of energy use of appliances in a low-energy house. *Energy and Buildings*, 140, 81–97.
+
+Không phân phối lại file CSV qua Git; mỗi thành viên tự tải về `data/raw/` và đối chiếu SHA-256 ở §1.
+
+## 6. Artifact
+
+| Artifact | Vai trò |
+|---|---|
+| [EDA.py](../EDA.py) | Source EDA, theo cấu trúc [LAB2/EDA.py](../../LAB2/EDA.py); chạy `python EDA.py` trong thư mục `Coursework` |
+| `data/splits.json` | Ranh giới train/val/test và SHA-256 CSV (ngoài Git, sinh lại tất định) |
+| [reports/eda_stats.json](../reports/eda_stats.json) | Nguồn số liệu đầy đủ, gồm mean/std chuẩn hoá |
+| [reports/eda_report.html](../reports/eda_report.html) | Báo cáo EDA HTML tự chứa, đọc offline |
+| `docs/assets/eda_*.png` | Hình trích từ EDA, không thay thế số liệu JSON |
+
+## 7. Phương án thay thế
 
 | Rủi ro | Phương án |
 |---|---|
-| Không lấy được checkpoint teacher từ người đã chạy LAB2 | Train lại run 01 → 02 bằng `LAB2/train.py`; LAB2 ghi nhận tổng phase khoảng 87 phút trên RTX 3050. Phải kiểm tra lại test accuracy và cập nhật hash |
-| Không lấy được `splits.npz` | Sinh lại bằng `LAB2/EDA.py` (stratified, seed 42), rồi đối chiếu số ảnh mỗi lớp với LAB2 trước khi dùng |
-| Khoảng cách teacher–student quá nhỏ: `G < 2σ` theo [lab-description.md §4.3](lab-description.md#43-quy-trình-chốt-ngưỡng) | Chuyển sang **CIFAR-100** — cùng định dạng 32×32, 100 lớp, khó hơn. Checkpoint LAB2 chỉ có 10 lớp nên phải fine-tune teacher mới bằng pipeline LAB2 và tạo split mới |
-| Forward teacher online làm training quá chậm hoặc thiếu VRAM 6 GB | Tính trước logits một lần trên ảnh không augmentation, lưu theo chỉ số trong `splits.npz` (45.000 × 10 × 4 byte ≈ 1.8 MB); ghi rõ giới hạn lệch augmentation nêu ở §2.2 |
+| Tập test (20 ngày) nhỏ, kết quả nhạy với vài đỉnh | Khi đánh giá test, báo cáo thêm sai số theo ngày hoặc theo giờ; không đổi split |
+| Lệch mùa làm mô hình dùng nhiệt độ tuyệt đối kém trên test (§4.6) | Thí nghiệm ablation bỏ nhóm nhiệt độ, hoặc dùng sai phân nhiệt độ; chọn bằng validation |
+| Mô hình không vượt persistence | Ghi nhận như một kết quả hợp lệ; kiểm tra lại cửa sổ, `log1p`, mã hoá thời gian trước khi kết luận |

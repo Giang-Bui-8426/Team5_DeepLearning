@@ -1,68 +1,70 @@
-# Coursework — Knowledge Distillation: nén CNN phân loại CIFAR-10 cho suy luận thời gian thực
+# Coursework — Topic 8: Dự báo điện năng thiết bị gia dụng bằng Transformer Encoder
 
-> **Trạng thái: chờ nhóm duyệt.** Tài liệu sở hữu mục 1–4 (đề tài, hướng chính, người dùng, mục tiêu). Mục 6–10 (phạm vi, phương pháp, sản phẩm, đánh giá, kế hoạch) thuộc thành viên còn lại; tài liệu này không lặp các nội dung đó.
+> **Trạng thái: đã chốt ngày 19/11/2026.** Tài liệu sở hữu mục 1–4 (đề tài, hướng chính, người dùng, mục tiêu). Dữ liệu (mục 5) thuộc [data.md](data.md); mục 6–10 thuộc thành viên còn lại. Tài liệu này không lặp các nội dung đó.
 
 ## 1. Tên đề tài
 
-**Knowledge Distillation từ ResNet18 fine-tuned sang CNN nhỏ để phân loại ảnh CIFAR-10 thời gian thực trên CPU laptop.**
+**Dự báo điện năng thiết bị gia dụng 10 phút tới từ chuỗi thời gian đa biến bằng Transformer Encoder, đối chứng với LSTM, trên dữ liệu UCI Appliances Energy Prediction.**
 
 | Thành phần | Nội dung |
 |---|---|
-| Công nghệ / hành động | Knowledge Distillation (teacher → student) |
-| Bài toán | Phân loại ảnh 10 lớp |
-| Phạm vi | CIFAR-10; teacher là checkpoint đã chọn của LAB2; thiết bị đích là laptop RTX 3050 6 GB, chỉ số chính đo trên CPU của máy này |
+| Công nghệ / hành động | Transformer Encoder cho hồi quy; LSTM làm baseline học sâu; phân tích attention map |
+| Bài toán | Hồi quy chuỗi thời gian đa biến (multivariate time-series regression): dự báo `Appliances` (Wh) tại mốc kế tiếp |
+| Phạm vi | Một ngôi nhà tiết kiệm năng lượng ở Bỉ, 11/01–27/05/2016, bước 10 phút, 25 đặc trưng cảm biến/thời tiết ([data.md §1](data.md#1-dataset-và-trường-dữ-liệu)) |
 
 ## 2. Hướng chính
 
-**Realtime.** Distillation nhằm giảm chi phí suy luận để mô hình đạt tốc độ thời gian thực khi không dùng GPU, trong khi giữ chất lượng dự đoán gần teacher. Tốc độ và kích thước là mục tiêu; chất lượng dự đoán là ràng buộc.
+**AI dự đoán.** Mục tiêu là dự báo chính xác lượng điện tiêu thụ ngắn hạn từ lịch sử đa biến, và giải thích được mô hình dựa vào mốc thời gian nào thông qua attention. Tốc độ suy luận không phải ràng buộc: mỗi dự báo có 10 phút trước khi mốc tiếp theo đến.
 
 ## 3. Người dùng và vấn đề
 
-**Người dùng:** người cần chạy phân loại ảnh trên laptop phổ thông mà không phụ thuộc GPU — máy không có GPU rời, hoặc GPU đang bận cho tác vụ khác.
+**Người dùng:** hộ gia đình và hệ thống quản lý năng lượng tòa nhà (BEMS) cần biết trước tải điện thiết bị trong thời gian ngắn để dời lịch thiết bị, cảnh báo tiêu thụ bất thường hoặc tham gia điều chỉnh phụ tải.
 
-**Khó khăn hiện tại** — căn cứ kết quả thật của LAB2 ([evaluation.md](../../LAB2/Docs/evaluation.md)):
+**Khó khăn hiện tại**, căn cứ EDA ([data.md §4](data.md#4-kết-quả-eda-và-ý-nghĩa-sử-dụng)):
 
-| Quan sát từ LAB2 | Hệ quả khi triển khai |
+| Quan sát | Hệ quả |
 |---|---|
-| Mô hình tốt nhất (ResNet18 FT) đạt test accuracy 92.91% với 11,181,642 tham số | Kích thước lớn so với bài toán ảnh 32×32 |
-| Đầu vào phải resize lên 224×224 theo preprocessing ImageNet ([data.md §3](../../LAB2/Docs/data.md#3-hợp-đồng-preprocessing)) trong khi ảnh gốc 32×32 | Mỗi ảnh xử lý gấp 49 lần số pixel gốc |
-| Trên GPU RTX 3050, forward FP32 10.000 ảnh test mất 11.789 s (batch 32), tức ~1.2 ms/ảnh | Trên GPU, teacher nhiều khả năng đã đủ nhanh — vì vậy chỉ số chính là **CPU**, nơi chi phí trên trở thành nút thắt |
-| LAB2 chưa đo latency trên CPU | Chưa kết luận teacher "chậm" trên CPU trước khi đo baseline (mục 4.3) |
+| Tiêu thụ nền thấp (trung vị 60 Wh) xen các đỉnh ngắn đến 1080 Wh; 10% mốc cao nhất chiếm 37.1% năng lượng | Phần cần dự báo nhất, tức các đỉnh, cũng là phần khó nhất |
+| Dự báo "giữ nguyên giá trị trước" (persistence) đã đạt R² 0.481 trên validation nhưng luôn trễ một bước ở đỉnh | Cách đơn giản nhất bỏ lỡ đúng thời điểm tải tăng |
+| Không cảm biến nào tương quan mạnh với mục tiêu (\|Spearman\| lớn nhất 0.354) | Không thể dự báo tốt bằng quy tắc hay hồi quy tuyến tính trên một vài cảm biến |
+| Train là mùa đông, test là cuối xuân; nhiệt độ lệch mạnh giữa hai tập | Mô hình phải tổng quát sang điều kiện chưa thấy |
 
-Train trực tiếp một CNN nhỏ trên nhãn cứng thường kém hơn mô hình lớn; distillation dùng phân phối xác suất của teacher (soft label) để thu hẹp khoảng cách này. Mức thu hẹp thực tế là giả thuyết, kiểm chứng bằng ngưỡng ở mục 4.2.
+Lý do chọn Transformer Encoder và kỳ vọng so với LSTM nằm ở [model.md §1](model.md#1-kiến-trúc-lựa-chọn). Đó là giả thuyết, được kiểm chứng bằng các ngưỡng ở mục 4.2.
 
 ## 4. Mục tiêu
 
 ### 4.1. Đầu ra cần đạt
 
-- Một mô hình **student** đã distill, kèm checkpoint và metadata tái lập.
-- Bảng so sánh **teacher / student train thường / student KD** trên cùng split và cùng giao thức test.
-- Số đo latency trên laptop RTX 3050 cho teacher và student: CPU là chỉ số chính, GPU báo cáo kèm.
+- Mô hình **Transformer Encoder** đã train, dự báo `Appliances` 1 bước, có checkpoint tái lập được.
+- Mô hình **LSTM** baseline đã train.
+- Bảng so sánh **persistence / LSTM / Transformer** trên validation và test.
+- **Attention map** của Transformer, đối chiếu với tự tương quan đã đo trong EDA.
 
 ### 4.2. Chỉ số và ngưỡng nghiệm thu
 
+Metric tính trên **Wh** (sau khi đảo mọi biến đổi mục tiêu), dự báo 1 bước. Mốc so sánh là persistence trên validation, đã đo trong [data.md §4.7](data.md#47-baseline-tham-chiếu-trên-validation): **RMSE 66.43 Wh, MAE 26.16 Wh, R² 0.481**.
+
 | Mục tiêu | Chỉ số | Ngưỡng | Trạng thái |
 |---|---|---|---|
-| Realtime | Latency **toàn quy trình** (ảnh 32×32 → nhãn), CPU, batch 1, p95 | ≤ **33.3 ms/ảnh** (30 FPS) | Chốt |
-| Mô hình nhỏ | Tổng tham số student | ≤ 10% teacher, tức ≤ **1,118,164** | Chốt |
-| KD có tác dụng | Validation accuracy student KD | ≥ μ + 2σ, với μ, σ là trung bình và độ lệch chuẩn của student train thường qua 3 seed | Công thức chốt; số điền sau baseline |
-| Giữ chất lượng | Khoảng cách tới teacher, `G = acc(teacher) − μ` | Student KD thu hẹp ≥ 50% khoảng `G`: `acc(KD) ≥ μ + 0.5·G` | Công thức chốt; số điền sau baseline |
+| Vượt baseline không học máy | MAE và RMSE validation của Transformer | Thấp hơn persistence **≥ 5%**: MAE ≤ **24.85 Wh**, RMSE ≤ **63.11 Wh** | Chốt 19/11/2026 |
+| Giải thích được biến động | R² validation của Transformer | > **0.481** (persistence) | Chốt 19/11/2026 |
+| So sánh Transformer với LSTM | MAE và RMSE validation | Với 1 seed: chỉ báo cáo chênh lệch, không kết luận mô hình nào tốt hơn. Kết luận "tốt hơn" cần 3 seed mỗi mô hình (khảo sát seed ở [trainning.md §9](trainning.md#9-khảo-sát-mở-rộng-tùy-chọn)) và chênh lệch MAE trung bình > tổng hai độ lệch chuẩn | Công thức chốt; số điền sau train |
+| Dự báo đỉnh | MAE trên các mốc có `Appliances` ≥ p90 (196 Wh) | Báo cáo cho cả ba phương pháp, không đặt ngưỡng | Chỉ báo cáo |
+| Attention | Trọng số attention trung bình theo độ trễ | Báo cáo định tính: đối chiếu với ACF (lag gần và lag 144); không đặt ngưỡng | Chỉ báo cáo |
 
-Hai ngưỡng sau xét trên **validation**, cùng giao thức chọn checkpoint của LAB2; test chỉ dùng xác nhận cuối. Accuracy và macro F1 giữ định nghĩa của LAB2 để so sánh được với teacher. GPU latency và dung lượng checkpoint chỉ báo cáo, không đặt ngưỡng.
+Ngưỡng xét trên **validation**; test chỉ dùng một lần để xác nhận cuối và báo cáo cả RMSE, MAE, R². Vì giữa train và test có lệch mùa ([data.md §4.6](data.md#46-lệch-phân-phối-theo-mùa-giữa-các-tập)), sai số test cao hơn validation là rủi ro đã biết; khi đó phải ghi nhận, không được đổi split hay ngưỡng.
 
 ### 4.3. Quy trình chốt ngưỡng
 
-1. **Đo baseline trên laptop RTX 3050**, ghi tên CPU, phiên bản PyTorch và số luồng CPU:
-   - Teacher, CPU, batch 1: warm-up 50 lần, đo 500 lần, `torch.inference_mode()`, cố định `torch.set_num_threads`; lấy trung vị và p95. Ghi riêng **chỉ forward** và **toàn quy trình** (gồm resize 224 của teacher).
-   - Student train thường (không KD), **3 seed**, cùng kiến trúc và ngân sách train với student KD → μ, σ trên validation.
-2. **Tính và khóa ngưỡng** theo bảng 4.2, ghi vào tài liệu tiến độ kèm ngày **trước khi** train student KD. Không sửa ngưỡng sau khi thấy kết quả KD.
-3. **Nhánh dự phòng:** nếu `G < 2σ` — student train thường đã gần teacher — KD không đủ khoảng để chứng minh tác dụng; chuyển sang CIFAR-100 theo [data.md §5](data.md#5-phương-án-thay-thế).
-
-Cách cài đặt phép đo latency và kiến trúc student thuộc tài liệu đánh giá/phương pháp (mục 7, 9).
+1. Mức cải thiện 5% so với persistence ở bảng 4.2 đã chốt ngày **19/11/2026**, **trước khi** train Transformer.
+2. Không sửa ngưỡng sau khi đã thấy kết quả validation hoặc test.
+3. Nếu Transformer không đạt ngưỡng, kết quả vẫn được báo cáo như một phát hiện hợp lệ, kèm phân tích nguyên nhân.
 
 ## Tài liệu chi tiết
 
 | Nội dung | Tài liệu |
 |---|---|
-| Dữ liệu, soft label của teacher, quyền sử dụng | [data.md](data.md) |
-| Phạm vi, phương pháp, sản phẩm, đánh giá, kế hoạch (mục 6–10) | `⟨thành viên còn lại — đặt link khi có file⟩` |
+| Dữ liệu, EDA, split, quyền sử dụng (mục 5) | [data.md](data.md) · [báo cáo EDA](../reports/eda_report.html) |
+| Phương pháp: baseline và kiến trúc (mục 7) | [model.md](model.md) |
+| Cấu hình train, đánh giá | [trainning.md](trainning.md) |
+| Kế hoạch, tiến độ và rủi ro (mục 10) | [plan-progress.md](plan-progress.md) |
